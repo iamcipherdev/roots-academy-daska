@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { X, ChevronLeft, ChevronRight, ZoomIn, Images } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { GALLERY, GALLERY_CATEGORIES, type GalleryItem } from "@/lib/site-data";
 import { SectionHeader } from "./SectionHeader";
 import { Reveal } from "./Reveal";
@@ -49,9 +49,9 @@ export function Gallery() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="Gallery"
-          title="Real photos from"
-          highlight="Roots Academy Daska"
-          description="Photographs and official posters from the academy's own public channels — its campuses, computer lab, classes and announcements."
+          title="Life at"
+          highlight="Roots Academy"
+          description="A look inside the academy — campuses, computer lab, classes and official announcements."
         />
 
         {/* category filter */}
@@ -114,12 +114,6 @@ export function Gallery() {
           ))}
         </div>
 
-        <Reveal delay={0.12} className="mt-8">
-          <p className="flex items-center justify-center gap-2 text-center text-[13px] font-semibold text-muted-foreground">
-            <Images className="h-4 w-4 text-primary" aria-hidden />
-            All photos above are from Roots Academy&apos;s own public posts and Google Maps listing.
-          </p>
-        </Reveal>
       </div>
 
       {/* Lightbox */}

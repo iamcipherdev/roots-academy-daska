@@ -1,13 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { GraduationCap, Phone, MapPin, MessageCircle, Youtube, Music2, ArrowUpRight } from "lucide-react";
-import { CONTACT, NAV_LINKS } from "@/lib/site-data";
+import { CONTACT, NAV_LINKS, CAMPUSES, telHref } from "@/lib/site-data";
 
 export function Footer() {
   return (
     <footer className="mt-auto bg-[#141414] text-white/70">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+        <div className="grid gap-10 md:grid-cols-[1.3fr_0.8fr_1.1fr]">
           {/* brand */}
           <div>
             <div className="flex items-center gap-2.5">
@@ -30,6 +31,26 @@ export function Footer() {
             <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-[12px] font-bold text-white/60 ring-1 ring-white/10">
               &ldquo;Keys of Success&rdquo; — official academy motto
             </p>
+            <div className="mt-5 flex gap-2.5">
+              <a
+                href={CONTACT.socials.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Roots Academy on YouTube"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 transition-colors hover:bg-primary hover:text-white"
+              >
+                <Youtube className="h-4.5 w-4.5" aria-hidden />
+              </a>
+              <a
+                href={CONTACT.socials.tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Roots Academy on TikTok"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 transition-colors hover:bg-primary hover:text-white"
+              >
+                <Music2 className="h-4.5 w-4.5" aria-hidden />
+              </a>
+            </div>
           </div>
 
           {/* quick links */}
@@ -40,30 +61,42 @@ export function Footer() {
             <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5 md:grid-cols-1">
               {NAV_LINKS.map((l) => (
                 <li key={l.href}>
-                  <a
+                  <Link
                     href={l.href}
                     className="text-[13.5px] font-semibold text-white/55 transition-colors hover:text-primary"
                   >
                     {l.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </nav>
 
-          {/* contact */}
+          {/* campuses + contact */}
           <div>
             <h3 className="text-[13px] font-extrabold uppercase tracking-wider text-white">
-              Contact
+              Campuses
             </h3>
-            <ul className="mt-4 space-y-3 text-[13.5px]">
-              <li className="flex items-start gap-2.5">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-                <span className="leading-relaxed">Model Town, Daska, Punjab 51010</span>
-              </li>
+            <ul className="mt-4 space-y-4 text-[13.5px]">
+              {CAMPUSES.map((campus) => (
+                <li key={campus.name} className="flex items-start gap-2.5">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+                  <span className="leading-relaxed">
+                    <span className="block font-bold text-white/80">{campus.name}</span>
+                    {campus.lines.map((line) => (
+                      <span key={line} className="block text-white/50">
+                        {line}
+                      </span>
+                    ))}
+                  </span>
+                </li>
+              ))}
               <li className="flex items-start gap-2.5">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-                <a href={`tel:${CONTACT.primaryPhone.replace(/-/g, "")}`} className="transition-colors hover:text-primary">
+                <a
+                  href={telHref(CONTACT.primaryPhone)}
+                  className="transition-colors hover:text-primary"
+                >
                   {CONTACT.primaryPhone}
                 </a>
               </li>
@@ -80,26 +113,6 @@ export function Footer() {
                 </a>
               </li>
             </ul>
-            <div className="mt-5 flex gap-2.5">
-              <a
-                href={CONTACT.socials.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 transition-colors hover:bg-primary hover:text-white"
-              >
-                <Youtube className="h-4.5 w-4.5" aria-hidden />
-              </a>
-              <a
-                href={CONTACT.socials.tiktok}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="TikTok"
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 transition-colors hover:bg-primary hover:text-white"
-              >
-                <Music2 className="h-4.5 w-4.5" aria-hidden />
-              </a>
-            </div>
           </div>
         </div>
 

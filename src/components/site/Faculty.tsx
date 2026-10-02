@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { GraduationCap, BookOpen, Award, Info } from "lucide-react";
-import { CONTACT, FACULTY } from "@/lib/site-data";
+import Link from "next/link";
+import { GraduationCap, BookOpen, ArrowRight } from "lucide-react";
+import { FACULTY } from "@/lib/site-data";
 import { SectionHeader } from "./SectionHeader";
 import { Reveal } from "./Reveal";
 
@@ -14,12 +15,12 @@ export function Faculty() {
           eyebrow="Faculty"
           title="Guided by qualified"
           highlight="subject specialists"
-          description="Roots Academy's academic programs are supervised by Dr. Mohsin Ali (PhD Physics), with specialist teachers leading each course. Profiles below are verified from the academy's official posters."
+          description="Roots Academy's academic programs are supervised by Dr. Mohsin Ali (PhD Physics), with specialist teachers leading each course."
         />
 
         <div className="mx-auto mt-12 grid max-w-4xl gap-5 sm:grid-cols-2 lg:gap-6">
-          {FACULTY.map((member, i) => (
-            <Reveal key={member.name} delay={i * 0.1}>
+          {FACULTY.map((member, i) => {
+            const card = (
               <article className="group h-full overflow-hidden rounded-2xl border border-border bg-white shadow-card transition-shadow duration-300 hover:shadow-card-hover">
                 {/* photo */}
                 <div className="relative aspect-[4/3.4] overflow-hidden bg-secondary">
@@ -49,27 +50,33 @@ export function Faculty() {
                       <BookOpen className="h-4 w-4 shrink-0 text-primary" aria-hidden />
                       {member.subject}
                     </li>
-                    <li className="flex items-center gap-2">
-                      <Award className="h-4 w-4 shrink-0 text-primary" aria-hidden />
-                      {CONTACT.shortName} faculty — verified profile
-                    </li>
                   </ul>
+                  {member.profileHref && (
+                    <span className="mt-4 inline-flex items-center gap-1.5 text-[13.5px] font-bold text-primary">
+                      View Profile
+                      <ArrowRight
+                        className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                        aria-hidden
+                      />
+                    </span>
+                  )}
                 </div>
               </article>
-            </Reveal>
-          ))}
-        </div>
+            );
 
-        <Reveal delay={0.18} className="mt-8">
-          <p className="mx-auto flex max-w-3xl items-start gap-2.5 rounded-2xl bg-white px-5 py-4 text-[13px] leading-relaxed text-muted-foreground ring-1 ring-border">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-            <span>
-              Only faculty members publicly announced by the academy are shown here. Additional
-              subject teachers introduce themselves in class — full profiles will be added as the
-              academy publishes them.
-            </span>
-          </p>
-        </Reveal>
+            return (
+              <Reveal key={member.name} delay={i * 0.1}>
+                {member.profileHref ? (
+                  <Link href={member.profileHref} className="block h-full" aria-label={`View profile of ${member.name}`}>
+                    {card}
+                  </Link>
+                ) : (
+                  card
+                )}
+              </Reveal>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

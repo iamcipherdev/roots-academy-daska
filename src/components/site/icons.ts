@@ -1,0 +1,67 @@
+import {
+  BookOpen,
+  GraduationCap,
+  Briefcase,
+  Palette,
+  Globe,
+  ShoppingCart,
+  BrainCircuit,
+  Laptop,
+  DraftingCompass,
+  Terminal,
+  Braces,
+  Coffee,
+  FileCode2,
+  Monitor,
+  Megaphone,
+  Languages,
+  Mic,
+  CalendarCheck,
+  FileCheck,
+  ClipboardList,
+  Target,
+  TrendingUp,
+  Route,
+  Layers,
+  Repeat,
+  MonitorSmartphone,
+  Sprout,
+  type LucideIcon,
+} from "lucide-react";
+
+/** Shared icon-name → icon map (data files reference icons by name). */
+export const ICONS: Record<string, LucideIcon> = {
+  BookOpen,
+  GraduationCap,
+  Briefcase,
+  Palette,
+  Globe,
+  ShoppingCart,
+  BrainCircuit,
+  Laptop,
+  DraftingCompass,
+  Terminal,
+  Braces,
+  Coffee,
+  FileCode2,
+  Monitor,
+  Megaphone,
+  Languages,
+  Mic,
+  CalendarCheck,
+  FileCheck,
+  ClipboardList,
+  Target,
+  TrendingUp,
+  Route,
+  Layers,
+  Repeat,
+  MonitorSmartphone,
+  Sprout,
+};
+
+export function iconFor(name: string): LucideIcon {
+  return ICONS[name] ?? BookOpen;
+}
+
+export { BookOpen, Monitor, Languages };

@@ -2,11 +2,12 @@ import { Navbar } from "@/components/site/Navbar";
 import { Hero } from "@/components/site/Hero";
 import { WhyRoots } from "@/components/site/WhyRoots";
 import { AcademicSystem } from "@/components/site/AcademicSystem";
-import { Programs } from "@/components/site/Programs";
+import { CoursePreview } from "@/components/site/CoursePreview";
 import { Faculty } from "@/components/site/Faculty";
-import { Results } from "@/components/site/Results";
+import { FounderPreview } from "@/components/site/FounderPreview";
+import { StudentAssessment } from "@/components/site/StudentAssessment";
 import { Gallery } from "@/components/site/Gallery";
-import { Testimonials } from "@/components/site/Testimonials";
+import { WhyChoose } from "@/components/site/WhyChoose";
 import { Admissions } from "@/components/site/Admissions";
 import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
@@ -20,11 +21,12 @@ export default function Home() {
         <Hero />
         <WhyRoots />
         <AcademicSystem />
-        <Programs />
+        <CoursePreview />
         <Faculty />
-        <Results />
+        <FounderPreview />
+        <StudentAssessment />
         <Gallery />
-        <Testimonials />
+        <WhyChoose />
         <Admissions />
         <Contact />
       </main>

@@ -33,7 +33,7 @@ export function Hero() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
               </span>
-              Admissions Open 2025 — Daska &amp; Jamkey Cheema
+              Admissions Now Open — Daska &amp; Jamke Cheema
             </span>
           </motion.div>
 
@@ -177,10 +177,10 @@ export function Hero() {
             className="absolute -right-2 bottom-10 rounded-2xl border border-border bg-white/95 px-4 py-3 shadow-card backdrop-blur sm:-right-4"
           >
             <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-              Google rating
+              Two campuses
             </p>
             <p className="text-[14px] font-extrabold text-foreground">
-              4.2 / 5 <span className="text-primary">★</span> verified listing
+              Daska <span className="text-primary">&amp;</span> Jamke Cheema
             </p>
           </motion.div>
         </motion.div>

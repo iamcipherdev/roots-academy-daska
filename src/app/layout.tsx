@@ -16,10 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("http://localhost:3000"),
-  title: "Roots Academy of Sciences & Computer College — Daska | Strong Roots. Better Results.",
+  metadataBase: new URL("https://rootsacademy.space-z.ai"),
+  title: {
+    default: "Roots Academy of Sciences | Daska",
+    template: "%s | Roots Academy",
+  },
   description:
-    "Roots Academy of Sciences & Computer College, Model Town Daska — quality education, weekly tests, monthly short tests, science and computer education under the supervision of Dr. Mohsin Ali (PhD Physics). Admissions open for Daska and Jamkey Cheema campuses.",
+    "Explore academic, computer, language and professional courses at Roots Academy of Sciences in Daska. Quality education, weekly tests and dedicated academic guidance across our Daska and Jamke Cheema campuses.",
   keywords: [
     "Roots Academy Daska",
     "Roots Academy of Sciences",
@@ -51,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <body
         className={`${jakarta.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >

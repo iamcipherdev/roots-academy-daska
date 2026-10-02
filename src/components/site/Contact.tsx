@@ -1,7 +1,7 @@
 "use client";
 
-import { Phone, MessageCircle, MapPin, Clock, Youtube, Music2, Building2 } from "lucide-react";
-import { CONTACT } from "@/lib/site-data";
+import { Phone, MessageCircle, MapPin, Clock, Youtube, Music2, Building2, ExternalLink } from "lucide-react";
+import { CONTACT, CAMPUSES, telHref } from "@/lib/site-data";
 import { SectionHeader } from "./SectionHeader";
 import { Reveal } from "./Reveal";
 import { Button } from "@/components/ui/button";
@@ -15,41 +15,54 @@ export function Contact() {
         <SectionHeader
           eyebrow="Campus & Contact"
           title="Visit our"
-          highlight="Model Town campus"
+          highlight="campuses"
           description="Meet our teachers, see the computer lab and discuss your academic plan in person. You are always welcome at Roots Academy."
         />
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-[1fr_1.15fr]">
-          {/* info cards */}
-          <div className="flex flex-col gap-4">
-            <Reveal>
-              <div className="rounded-2xl border border-border bg-white p-6 shadow-card">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
-                  <MapPin className="h-5.5 w-5.5" aria-hidden />
-                </span>
-                <h3 className="mt-4 text-[17px] font-extrabold tracking-tight text-foreground">
-                  {CONTACT.name}
+        {/* campus cards */}
+        <div className="mt-12 grid gap-5 md:grid-cols-2">
+          {CAMPUSES.map((campus, i) => (
+            <Reveal key={campus.name} delay={i * 0.08}>
+              <article className="flex h-full flex-col rounded-2xl border border-border bg-white p-7 shadow-card transition-shadow duration-300 hover:shadow-card-hover">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary">
+                    <Building2 className="h-6 w-6" aria-hidden />
+                  </span>
+                  <span className="rounded-full bg-brand-light px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-brand-deep">
+                    {campus.badge}
+                  </span>
+                </div>
+                <h3 className="mt-5 text-xl font-extrabold tracking-tight text-foreground">
+                  {campus.name}
                 </h3>
-                <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-                  {CONTACT.address}
-                </p>
-                <p className="mt-1.5 flex items-start gap-1.5 text-[13px] leading-relaxed text-muted-foreground">
-                  <Building2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
-                  {CONTACT.subCampus}
-                </p>
-                <a
-                  href={CONTACT.googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-bold text-primary hover:underline"
-                >
-                  Open in Google Maps
-                </a>
-              </div>
+                <address className="mt-2.5 not-italic">
+                  {campus.lines.map((line) => (
+                    <p key={line} className="text-[14.5px] leading-relaxed text-muted-foreground">
+                      {line}
+                    </p>
+                  ))}
+                </address>
+                {campus.mapsUrl && (
+                  <a
+                    href={campus.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-auto inline-flex items-center gap-1.5 pt-5 text-[13.5px] font-bold text-primary hover:underline"
+                  >
+                    View on Google Maps
+                    <ExternalLink className="h-4 w-4" aria-hidden />
+                  </a>
+                )}
+              </article>
             </Reveal>
+          ))}
+        </div>
 
+        {/* contact + map */}
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.15fr]">
+          <div className="flex flex-col gap-4">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Reveal delay={0.06}>
+              <Reveal delay={0.05}>
                 <div className="h-full rounded-2xl border border-border bg-white p-6 shadow-card">
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
                     <Phone className="h-5.5 w-5.5" aria-hidden />
@@ -59,7 +72,7 @@ export function Contact() {
                     {CONTACT.phones.map((p) => (
                       <li key={p}>
                         <a
-                          href={`tel:${p.replace(/-/g, "")}`}
+                          href={telHref(p)}
                           className="text-[14px] font-bold text-foreground/75 transition-colors hover:text-primary"
                         >
                           {p}
@@ -70,7 +83,7 @@ export function Contact() {
                 </div>
               </Reveal>
 
-              <Reveal delay={0.1}>
+              <Reveal delay={0.09}>
                 <div className="h-full rounded-2xl border border-border bg-white p-6 shadow-card">
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
                     <MessageCircle className="h-5.5 w-5.5" aria-hidden />
@@ -96,7 +109,7 @@ export function Contact() {
               </Reveal>
             </div>
 
-            {/* socials — verified only */}
+            {/* socials — verified accounts only */}
             <Reveal delay={0.12}>
               <div className="rounded-2xl border border-border bg-white p-6 shadow-card">
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
@@ -128,15 +141,11 @@ export function Contact() {
                     <Music2 className="h-5 w-5" aria-hidden />
                   </a>
                 </div>
-                <p className="mt-3 text-[11.5px] leading-relaxed text-muted-foreground/70">
-                  Facebook and Instagram pages will be linked here once the academy confirms its
-                  official handles.
-                </p>
               </div>
             </Reveal>
           </div>
 
-          {/* map */}
+          {/* map — main campus listing */}
           <Reveal delay={0.1} className="min-h-[420px]">
             <div className="h-full min-h-[420px] overflow-hidden rounded-2xl border border-border shadow-card">
               <iframe

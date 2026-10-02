@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Send, MessageCircle, Phone, Loader2, CheckCircle2, MapPin } from "lucide-react";
 import { toast } from "sonner";
-import { CONTACT, PROGRAMS } from "@/lib/site-data";
+import { CONTACT, COURSES, COURSE_CATEGORIES, waHref } from "@/lib/site-data";
 import { Reveal } from "./Reveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,7 +99,7 @@ export function Admissions() {
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-white ring-1 ring-white/20">
               <MapPin className="h-3.5 w-3.5" aria-hidden />
-              Admissions Open 2025
+              Admissions Now Open
             </span>
             <h2 className="mt-5 text-3xl font-extrabold leading-tight tracking-tight text-white md:text-[2.7rem] md:leading-[1.12]">
               Ready to Join
@@ -108,8 +108,8 @@ export function Admissions() {
             </h2>
             <p className="mt-4 max-w-lg text-base leading-relaxed text-white/75 md:text-lg">
               Send an admission inquiry and our team will call you back with fee structure,
-              timings and campus details for Model Town Daska and Jamkey Cheema.
-            </p>
+              timings and campus details for Model Town Daska and Jamke Cheema.
+              </p>
           </Reveal>
 
           <Reveal delay={0.1}>
@@ -175,13 +175,28 @@ export function Admissions() {
                   Thank you for choosing Roots Academy. Our admissions team will contact you
                   soon, In sha Allah.
                 </p>
-                <Button
-                  onClick={() => setDone(false)}
-                  variant="outline"
-                  className="mt-6 h-11 rounded-xl border-border px-6 text-[14px] font-bold"
-                >
-                  Send another inquiry
-                </Button>
+                <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
+                  <Button
+                    asChild
+                    className="h-11 rounded-xl bg-primary px-6 text-[14px] font-bold hover:bg-brand-deep"
+                  >
+                    <a
+                      href={waHref()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <MessageCircle className="mr-2 h-4 w-4" aria-hidden />
+                      Continue on WhatsApp
+                    </a>
+                  </Button>
+                  <Button
+                    onClick={() => setDone(false)}
+                    variant="outline"
+                    className="h-11 rounded-xl border-border px-6 text-[14px] font-bold"
+                  >
+                    Send another inquiry
+                  </Button>
+                </div>
               </div>
             ) : (
               <>
@@ -268,14 +283,21 @@ export function Admissions() {
                         >
                           <SelectValue placeholder="Select program" />
                         </SelectTrigger>
-                        <SelectContent>
-                          {PROGRAMS.map((p) => (
-                            <SelectItem key={p.name} value={p.name}>
-                              {p.name}
-                            </SelectItem>
-                          ))}
-                          <SelectItem value="Not sure yet">Not sure yet</SelectItem>
-                        </SelectContent>
+                        <SelectContent className="max-h-80">
+                        {COURSE_CATEGORIES.map((cat) => (
+                          <div key={cat}>
+                            <div className="bg-[#fafafa] px-2 py-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                              {cat}
+                            </div>
+                            {COURSES.filter((c) => c.category === cat).map((c) => (
+                              <SelectItem key={c.slug} value={c.name}>
+                                {c.name}
+                              </SelectItem>
+                            ))}
+                          </div>
+                        ))}
+                        <SelectItem value="Not sure yet">Not sure yet</SelectItem>
+                      </SelectContent>
                       </Select>
                     </div>
                   </div>
