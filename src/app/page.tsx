@@ -13,12 +13,15 @@ import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 import { FloatingActions } from "@/components/site/FloatingActions";
 
+import { ParentPortalCTA } from "@/components/portal/ParentPortalCTA";
+
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1">
         <Hero />
+        <ParentPortalCTA />
         <WhyRoots />
         <AcademicSystem />
         <CoursePreview />
