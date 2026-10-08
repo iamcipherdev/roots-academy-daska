@@ -83,6 +83,19 @@ export default function FeesPage() {
     return `https://wa.me/${intl}?text=${encodeURIComponent(msg)}`;
   };
 
+  const pendingCount = list.filter((r) => r.has_record && r.pending > 0 && toIntlPhone(r.parent_phone)).length;
+
+  const remindAll = () => {
+    const targets = list.filter((r) => r.has_record && r.pending > 0 && toIntlPhone(r.parent_phone));
+    if (targets.length === 0) return;
+    if (!window.confirm(`${targets.length} parents ko WhatsApp reminder kholna hai? Browser popup block kare to "Allow" dabayein.`)) return;
+    targets.forEach((row, i) => {
+      const link = remindLink(row);
+      if (link) setTimeout(() => window.open(link, "_blank", "noopener"), i * 800);
+    });
+    setNotice(`${targets.length} reminders khol diye — har chat me Send dabana hoga.`);
+  };
+
   if (loading) {
     return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
@@ -103,8 +116,15 @@ export default function FeesPage() {
             </SelectContent>
           </Select>
           <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="h-12 rounded-xl sm:w-48" />
-          <div className="sm:ml-auto rounded-xl bg-red-50 px-4 py-2 text-sm font-bold text-red-800">
-            Total pending: Rs {totalPending.toLocaleString()}
+          <div className="flex items-center gap-2 sm:ml-auto">
+            <div className="rounded-xl bg-red-50 px-4 py-2 text-sm font-bold text-red-800">
+              Total pending: Rs {totalPending.toLocaleString()}
+            </div>
+            {pendingCount > 0 && (
+              <Button onClick={remindAll} variant="outline" className="h-12 rounded-xl font-bold">
+                <MessageCircle className="mr-2 h-4 w-4" /> Sab ko Remind ({pendingCount})
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>

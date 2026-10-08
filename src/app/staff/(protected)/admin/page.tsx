@@ -160,6 +160,10 @@ export default function AdminPage() {
         </TabsList>
 
         <TabsContent value="students" className="mt-5 space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <AddStudentCard classes={classes} onDone={loadStudents} />
+            <AddClassCard onDone={loadStudents} />
+          </div>
           {classes.map((c) => (
             <Card key={c.id} className="rounded-2xl">
               <CardHeader className="pb-2"><CardTitle className="text-base">{c.name} <span className="text-sm font-normal text-muted-foreground">({c.students.length})</span></CardTitle></CardHeader>
@@ -303,5 +307,110 @@ export default function AdminPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function AddStudentCard({ classes, onDone }: { classes: ClassInfo[]; onDone: () => void }) {
+  const [name, setName] = useState("");
+  const [className, setClassName] = useState("");
+  const [rollNo, setRollNo] = useState("");
+  const [phone, setPhone] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const submit = async () => {
+    const n = name.trim();
+    if (!n || !className || !rollNo.trim()) {
+      setMsg({ ok: false, text: "Naam, class aur roll number zaroori hain." });
+      return;
+    }
+    setSaving(true); setMsg(null);
+    try {
+      const r = await fetch("/api/portal/admin/students", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rows: [{ name: n, class_name: className, roll_no: rollNo.trim(), parent_phone: phone.trim() || null }] }),
+      });
+      const j = await r.json();
+      const first = j?.results?.[0];
+      if (j.ok && first?.ok) {
+        setMsg({ ok: true, text: `${n} add ho gaya.` });
+        setName(""); setRollNo(""); setPhone(""); onDone();
+      } else {
+        setMsg({ ok: false, text: first?.error || j.error || "Add nahi ho saka." });
+      }
+    } catch {
+      setMsg({ ok: false, text: "Add nahi ho saka." });
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <Card className="rounded-2xl">
+      <CardHeader className="pb-2"><CardTitle className="text-base">Naya Student</CardTitle></CardHeader>
+      <CardContent className="space-y-3">
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Student ka naam" className="h-12 rounded-xl" />
+        <div className="grid grid-cols-2 gap-3">
+          <Select value={className} onValueChange={setClassName}>
+            <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder="Class" /></SelectTrigger>
+            <SelectContent>
+              {classes.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Input value={rollNo} onChange={(e) => setRollNo(e.target.value)} placeholder="Roll no" className="h-12 rounded-xl" />
+        </div>
+        <Input value={phone} onChange={(e) => setPhone(e.target.value.replace(/[^0-9+]/g, ""))} placeholder="Parent phone (optional)" inputMode="tel" className="h-12 rounded-xl" />
+        {msg && (
+          <p className={`text-sm font-semibold ${msg.ok ? "text-emerald-700" : "text-red-700"}`}>{msg.text}</p>
+        )}
+        <Button onClick={submit} disabled={saving} className="h-12 w-full rounded-xl font-bold">
+          {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : "Student Add Karein"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function AddClassCard({ onDone }: { onDone: () => void }) {
+  const [name, setName] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const submit = async () => {
+    const n = name.trim();
+    if (!n) { setMsg({ ok: false, text: "Class ka naam likhein." }); return; }
+    setSaving(true); setMsg(null);
+    try {
+      const r = await fetch("/api/portal/classes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: n }),
+      });
+      const j = await r.json();
+      if (j.ok) {
+        setMsg({ ok: true, text: `Class "${n}" add ho gayi.` });
+        setName(""); onDone();
+      } else {
+        setMsg({ ok: false, text: j.error || "Add nahi ho saki." });
+      }
+    } catch {
+      setMsg({ ok: false, text: "Add nahi ho saki." });
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <Card className="rounded-2xl">
+      <CardHeader className="pb-2"><CardTitle className="text-base">Nayi Class</CardTitle></CardHeader>
+      <CardContent className="space-y-3">
+        <Input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submit()}
+          placeholder="e.g. 9-B" className="h-12 rounded-xl" maxLength={60} />
+        {msg && (
+          <p className={`text-sm font-semibold ${msg.ok ? "text-emerald-700" : "text-red-700"}`}>{msg.text}</p>
+        )}
+        <Button onClick={submit} disabled={saving} variant="outline" className="h-12 w-full rounded-xl font-bold">
+          {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : "Class Add Karein"}
+        </Button>
+        <p className="text-xs text-muted-foreground">Zyada students ek sath add karne hon to neeche CSV Import use karein.</p>
+      </CardContent>
+    </Card>
   );
 }

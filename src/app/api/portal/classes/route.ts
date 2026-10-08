@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { requireStaff } from "@/lib/portal/guards";
 import { supabaseAdmin, isPortalConfigured } from "@/lib/portal/supabase";
 
@@ -28,5 +28,42 @@ export async function GET() {
   } catch (err) {
     console.error("[classes] failed:", err);
     return NextResponse.json({ ok: false, error: "Classes load nahi ho sakin." }, { status: 500 });
+  }
+}
+
+/** POST /api/portal/classes — create a class (admin only). Body: { name }. */
+export async function POST(req: NextRequest) {
+  const guard = await requireStaff("admin");
+  if ("response" in guard) return guard.response;
+  if (!isPortalConfigured()) {
+    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+  }
+  try {
+    const body = await req.json().catch(() => ({}));
+    const name = String(body?.name ?? "").trim();
+    if (!name || name.length > 60) {
+      return NextResponse.json({ ok: false, error: "Class ka naam likhein (max 60)." }, { status: 400 });
+    }
+    const { session } = guard;
+    const sb = supabaseAdmin();
+    const { data: existing } = await sb
+      .from("classes")
+      .select("id")
+      .eq("academy_id", session.academy_id)
+      .eq("name", name)
+      .maybeSingle();
+    if (existing) {
+      return NextResponse.json({ ok: false, error: "Ye class pehle se hai." }, { status: 409 });
+    }
+    const { data: created, error } = await sb
+      .from("classes")
+      .insert({ academy_id: session.academy_id, name })
+      .select("id, name")
+      .single();
+    if (error) throw error;
+    return NextResponse.json({ ok: true, class: created });
+  } catch (err) {
+    console.error("[classes POST] failed:", err);
+    return NextResponse.json({ ok: false, error: "Class add nahi ho saki." }, { status: 500 });
   }
 }

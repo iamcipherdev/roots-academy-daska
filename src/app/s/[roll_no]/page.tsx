@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 import {
   Download, CircleCheck, CircleAlert, CalendarDays, Wallet, Trophy,
   User, Loader2, SearchX,
@@ -135,7 +136,7 @@ export default function ParentDashboardPage() {
                 Roll number <span className="font-bold text-foreground">“{rollNo}”</span> ka koi record nahi hai.
                 Apna roll number dobara check karein ya academy se rabta karein.
               </p>
-              <Button className="mt-6" onClick={() => (window.location.href = "/#parent-portal")}>
+              <Button className="mt-6" onClick={() => (window.location.href = "/parent-portal")}>
                 Dobara try karein
               </Button>
             </CardContent>
@@ -155,23 +156,24 @@ export default function ParentDashboardPage() {
         {state === "ready" && data && (
           <div className="space-y-5">
             {/* Header */}
-            <Card className="overflow-hidden rounded-2xl border-2">
-              <div className="bg-primary px-6 py-6 text-primary-foreground">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20">
-                    <User className="h-6 w-6" />
+            <Card className="overflow-hidden rounded-2xl border-2 shadow-sm">
+              <div className="bg-primary px-6 py-7 text-primary-foreground">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-2xl font-extrabold">
+                    {data.student.name.trim().charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <h1 className="text-2xl font-extrabold tracking-tight">{data.student.name}</h1>
-                    <p className="text-sm text-white/85">
-                      Roll {data.student.roll_no} · Class {data.student.class_name}
-                    </p>
+                  <div className="min-w-0">
+                    <h1 className="truncate text-2xl font-extrabold tracking-tight sm:text-3xl">{data.student.name}</h1>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
+                      <span className="rounded-full bg-white/20 px-2.5 py-1 font-bold">Roll {data.student.roll_no}</span>
+                      <span className="rounded-full bg-white/20 px-2.5 py-1 font-bold">Class {data.student.class_name}</span>
+                    </div>
                   </div>
                 </div>
               </div>
               <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
-                <p className="text-xs text-muted-foreground">{data.student.academy_name}</p>
-                <Button variant="outline" size="sm" onClick={downloadPDF} className="rounded-xl">
+                <p className="text-xs font-medium text-muted-foreground">{data.student.academy_name}</p>
+                <Button variant="outline" size="sm" onClick={downloadPDF} className="rounded-xl font-bold">
                   <Download className="mr-2 h-4 w-4" /> Report Card (PDF)
                 </Button>
               </CardContent>
@@ -186,14 +188,17 @@ export default function ParentDashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-5">
                   <div className="text-5xl font-extrabold tracking-tight text-foreground">
                     {data.attendance.percent}<span className="text-2xl text-muted-foreground">%</span>
                   </div>
-                  <div className="flex gap-4 text-sm">
-                    <div><div className="text-xl font-bold text-emerald-600">{data.attendance.present}</div><div className="text-muted-foreground">Hazir</div></div>
-                    <div><div className="text-xl font-bold text-red-600">{data.attendance.absent}</div><div className="text-muted-foreground">Ghair-hazir</div></div>
-                    <div><div className="text-xl font-bold text-amber-600">{data.attendance.late}</div><div className="text-muted-foreground">Late</div></div>
+                  <div className="flex-1">
+                    <Progress value={data.attendance.percent} className="h-3 rounded-full" />
+                    <div className="mt-3 flex gap-5 text-sm">
+                      <div><span className="text-xl font-bold text-emerald-600">{data.attendance.present}</span> <span className="text-muted-foreground">Hazir</span></div>
+                      <div><span className="text-xl font-bold text-red-600">{data.attendance.absent}</span> <span className="text-muted-foreground">Ghair-hazir</span></div>
+                      <div><span className="text-xl font-bold text-amber-600">{data.attendance.late}</span> <span className="text-muted-foreground">Late</span></div>
+                    </div>
                   </div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-1.5">
@@ -262,22 +267,45 @@ export default function ParentDashboardPage() {
                   <p className="text-sm text-muted-foreground">Abhi koi test result nahi hai.</p>
                 )}
                 {data.results.map((ex) => (
-                  <div key={ex.exam_id} className="rounded-xl border p-4">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-bold">{ex.name}</h3>
-                      <Badge className={`ml-auto border ${gradeStyles[ex.grade] ?? "bg-muted"}`}>{ex.grade}</Badge>
+                  <div key={ex.exam_id} className="overflow-hidden rounded-xl border">
+                    <div className="flex items-center gap-4 bg-muted/50 px-4 py-3.5">
+                      <div className="text-4xl font-extrabold tracking-tight">
+                        {ex.percent}<span className="text-lg text-muted-foreground">%</span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate font-bold">{ex.name}</h3>
+                        <p className="text-xs text-muted-foreground">
+                          {ex.total_obtained}/{ex.total_max} marks
+                        </p>
+                      </div>
+                      <Badge className={`border px-3 py-1 text-sm font-extrabold ${gradeStyles[ex.grade] ?? "bg-muted"}`}>
+                        {ex.grade}
+                      </Badge>
                     </div>
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      {ex.percent}% · {ex.total_obtained}/{ex.total_max}
-                      {ex.position && ` · Position ${ex.position} / ${ex.students_count}`}
-                    </div>
-                    <div className="mt-3 space-y-1.5">
-                      {ex.subjects.map((s) => (
-                        <div key={s.subject} className="flex items-center justify-between text-sm">
-                          <span>{s.subject}</span>
-                          <span className="font-semibold">{s.obtained}<span className="text-muted-foreground">/{s.total}</span></span>
-                        </div>
-                      ))}
+                    {ex.position != null && (
+                      <div className="flex items-center gap-2 border-b bg-amber-50 px-4 py-2 text-sm font-bold text-amber-800">
+                        <Trophy className="h-4 w-4" />
+                        Position {ex.position} / {ex.students_count} students
+                      </div>
+                    )}
+                    <div className="space-y-3 p-4">
+                      {ex.subjects.map((s) => {
+                        const pct = s.total > 0 ? Math.round((s.obtained / s.total) * 100) : 0;
+                        return (
+                          <div key={s.subject}>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="font-medium">{s.subject}</span>
+                              <span className="font-bold">
+                                {s.obtained}<span className="font-normal text-muted-foreground">/{s.total}</span>
+                                <span className={`ml-2 text-xs ${pct >= 80 ? "text-emerald-600" : pct >= 50 ? "text-amber-600" : "text-red-600"}`}>
+                                  {pct}%
+                                </span>
+                              </span>
+                            </div>
+                            <Progress value={pct} className="mt-1.5 h-2 rounded-full" />
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
