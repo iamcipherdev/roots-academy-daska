@@ -774,17 +774,6 @@ export interface GalleryItem {
 }
 
 export const GALLERY: GalleryItem[] = [
-  { src: "/images/lab-hero.jpg", category: "Computer Lab", caption: "Computer lab — Model Town campus", tall: true },
-  { src: "/images/practical-class.jpg", category: "Classes", caption: "Practical class demonstration", tall: true },
-  { src: "/images/interior.jpg", category: "Campus Life", caption: "Academy reception & waiting area" },
-  { src: "/images/campus-exterior.jpg", category: "Campus Life", caption: "Jamke Cheema campus exterior" },
-  { src: "/images/lab-students.jpg", category: "Computer Lab", caption: "Students working in the lab" },
-  { src: "/images/poster-computer-courses.jpg", category: "Programs & Posters", caption: "Official computer courses flyer" },
-  { src: "/images/poster-ielts.jpg", category: "Programs & Posters", caption: "Official IELTS classes poster", tall: true },
-  { src: "/images/banner-branches.jpg", category: "Campus Life", caption: "Branches — Daska & Jamke Cheema" },
-  { src: "/images/poster-dit.jpg", category: "Programs & Posters", caption: "DIT diploma announcement", tall: true },
-  { src: "/images/poster-social-marketing.jpg", category: "Programs & Posters", caption: "Social media marketing course" },
-  { src: "/images/poster-admissions-open.jpg", category: "Programs & Posters", caption: "Admissions open — Daska campus", tall: true },
   { src: "/images/gallery/poster-pharmacy.jpg", category: "Programs & Posters", caption: "Pharmacy campaign — Roots Science Club", tall: true },
   { src: "/images/gallery/poster-admission-2026.jpg", category: "Programs & Posters", caption: "Admissions open 2026 — official poster", tall: true },
   { src: "/images/gallery/poster-branch2-courses.jpg", category: "Programs & Posters", caption: "Computer college courses — Jamke Cheema campus", tall: true },
