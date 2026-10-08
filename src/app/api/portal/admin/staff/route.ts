@@ -7,7 +7,7 @@ import { hashPin, newSalt } from "@/lib/portal/auth";
 const addSchema = z.object({
   name: z.string().trim().min(2).max(80),
   phone: z.string().trim().min(10).max(15).regex(/^[0-9+\-\s()]+$/),
-  pin: z.string().trim().min(4).max(12).regex(/^[0-9]+$/, "PIN sirf digits mein ho."),
+  pin: z.string().trim().min(4).max(32),
   role: z.enum(["admin", "teacher"]).default("teacher"),
 });
 

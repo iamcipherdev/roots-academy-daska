@@ -6,7 +6,7 @@ import { hashPin, createSessionToken, setStaffSessionCookie } from "@/lib/portal
 
 const loginSchema = z.object({
   phone: z.string().trim().min(10).max(15).regex(/^[0-9+\-\s()]+$/),
-  pin: z.string().trim().min(4).max(12),
+  pin: z.string().trim().min(4).max(32),
 });
 
 const GENERIC_ERROR = "Incorrect phone number or PIN.";

@@ -18,7 +18,7 @@ export async function POST(
     const { id } = await params;
     const body = await req.json();
     const parsed = z.object({
-      pin: z.string().trim().min(4).max(12).regex(/^[0-9]+$/, "PIN sirf digits mein ho."),
+      pin: z.string().trim().min(4).max(32),
     }).safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ ok: false, error: "PIN 4–12 digits ka ho." }, { status: 400 });

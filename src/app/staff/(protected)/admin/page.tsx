@@ -137,14 +137,14 @@ export default function AdminPage() {
   };
 
   const resetPin = async () => {
-    if (!resetFor || !/^[0-9]{4,12}$/.test(newPin)) return;
+    if (!resetFor || newPin.trim().length < 4 || newPin.trim().length > 32) return;
     const r = await fetch(`/api/portal/admin/staff/${resetFor.id}/reset-pin`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ pin: newPin }),
     });
     const j = await r.json();
-    if (j.ok) { setNotice(`New PIN for ${resetFor.name}: ${newPin} (shown only once)`); setResetFor(null); setNewPin(""); }
-    else setNotice(j.error || "Could not reset PIN.");
+    if (j.ok) { setNotice(`New password for ${resetFor.name}: ${newPin} (shown only once)`); setResetFor(null); setNewPin(""); }
+    else setNotice(j.error || "Could not reset password.");
   };
 
   const setDues = async () => {
@@ -304,7 +304,7 @@ export default function AdminPage() {
           <div className="space-y-3">
             <Input value={sName} onChange={(e) => setSName(e.target.value)} placeholder="Name" className="h-12 rounded-xl" />
             <Input value={sPhone} onChange={(e) => setSPhone(e.target.value)} placeholder="Phone (03XXXXXXXXX)" inputMode="tel" className="h-12 rounded-xl" />
-            <Input value={sPin} onChange={(e) => setSPin(e.target.value.replace(/[^0-9]/g, ""))} placeholder="PIN (4-12 digits)" inputMode="numeric" type="password" className="h-12 rounded-xl" />
+            <Input value={sPin} onChange={(e) => setSPin(e.target.value)} placeholder="Password (min 4 characters)" type="password" className="h-12 rounded-xl" />
             <Select value={sRole} onValueChange={setSRole}>
               <SelectTrigger className="h-12 rounded-xl"><SelectValue /></SelectTrigger>
               <SelectContent><SelectItem value="teacher">Teacher</SelectItem><SelectItem value="admin">Admin</SelectItem></SelectContent>
@@ -340,13 +340,13 @@ export default function AdminPage() {
 
       <Dialog open={!!resetFor} onOpenChange={(o) => !o && setResetFor(null)}>
         <DialogContent className="rounded-2xl sm:max-w-sm">
-          <DialogHeader><DialogTitle>PIN Reset — {resetFor?.name}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Reset Password — {resetFor?.name}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <Input value={newPin} onChange={(e) => setNewPin(e.target.value.replace(/[^0-9]/g, ""))}
-              placeholder="New PIN (4-12 digits)" inputMode="numeric" type="password" className="h-12 rounded-xl text-center text-xl tracking-[0.5em]" />
-            <p className="text-xs text-muted-foreground">Naya PIN sirf ek dafa dikhega — teacher ko foran bata dein.</p>
+            <Input value={newPin} onChange={(e) => setNewPin(e.target.value)}
+              placeholder="New password (min 4 characters)" type="password" className="h-12 rounded-xl" />
+            <p className="text-xs text-muted-foreground">The new password is shown only once — share it with the teacher right away.</p>
             <DialogFooter>
-              <Button onClick={resetPin} disabled={!/^[0-9]{4,12}$/.test(newPin)} className="h-12 w-full rounded-xl font-bold">Set PIN</Button>
+              <Button onClick={resetPin} disabled={newPin.trim().length < 4 || newPin.trim().length > 32} className="h-12 w-full rounded-xl font-bold">Set Password</Button>
             </DialogFooter>
           </div>
         </DialogContent>

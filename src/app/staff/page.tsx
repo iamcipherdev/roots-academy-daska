@@ -61,8 +61,8 @@ export default function StaffLoginPage() {
             <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={pin} onChange={(e) => setPin(e.target.value)}
-              placeholder="PIN" type="password" inputMode="numeric"
-              className="h-12 rounded-xl pl-10 text-center text-xl tracking-[0.5em]"
+              placeholder="Password" type="password"
+              className="h-12 rounded-xl pl-10"
               onKeyDown={(e) => e.key === "Enter" && submit()}
             />
           </div>
