@@ -785,6 +785,19 @@ export const GALLERY: GalleryItem[] = [
   { src: "/images/poster-dit.jpg", category: "Programs & Posters", caption: "DIT diploma announcement", tall: true },
   { src: "/images/poster-social-marketing.jpg", category: "Programs & Posters", caption: "Social media marketing course" },
   { src: "/images/poster-admissions-open.jpg", category: "Programs & Posters", caption: "Admissions open — Daska campus", tall: true },
+  { src: "/images/gallery/poster-pharmacy.jpg", category: "Programs & Posters", caption: "Pharmacy campaign — Roots Science Club", tall: true },
+  { src: "/images/gallery/poster-admission-2026.jpg", category: "Programs & Posters", caption: "Admissions open 2026 — official poster", tall: true },
+  { src: "/images/gallery/poster-branch2-courses.jpg", category: "Programs & Posters", caption: "Computer college courses — Jamke Cheema campus", tall: true },
+  { src: "/images/gallery/poster-programs.jpg", category: "Programs & Posters", caption: "Admissions open — programs & campuses", tall: true },
+  { src: "/images/gallery/ceremony-1.jpg", category: "Campus Life", caption: "Certificate ceremony — Roots Academy of Sciences" },
+  { src: "/images/gallery/ceremony-2.jpg", category: "Campus Life", caption: "Student achievement ceremony — Model Town campus", tall: true },
+  { src: "/images/gallery/ceremony-3.jpg", category: "Campus Life", caption: "Diploma awarded — computer courses graduate", tall: true },
+  { src: "/images/gallery/ceremony-4.jpg", category: "Campus Life", caption: "Certificate distribution ceremony", tall: true },
+  { src: "/images/gallery/ceremony-5.jpg", category: "Campus Life", caption: "Teaching experience letter awarded", tall: true },
+  { src: "/images/gallery/ceremony-6.jpg", category: "Campus Life", caption: "Student certificate ceremony — Daska campus", tall: true },
+  { src: "/images/gallery/ceremony-7.jpg", category: "Campus Life", caption: "Certificate ceremony — Roots Academy", tall: true },
+  { src: "/images/gallery/ceremony-8.jpg", category: "Campus Life", caption: "Graduates with certificates — Daska campus" },
+  { src: "/images/gallery/ceremony-9.jpg", category: "Campus Life", caption: "Diploma ceremony — celebrating achievers" },
 ];
 
 export const GALLERY_CATEGORIES = [
