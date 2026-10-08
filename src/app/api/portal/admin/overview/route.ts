@@ -3,12 +3,12 @@ import { requireStaff } from "@/lib/portal/guards";
 import { supabaseAdmin, isPortalConfigured } from "@/lib/portal/supabase";
 import { currentMonthKey } from "@/lib/portal/dates";
 
-/** GET /api/portal/admin/overview?month= — "kis ne fee nahi di" + total pending. */
+/** GET /api/portal/admin/overview?month= — "who has not paid the fee" + total pending. */
 export async function GET(req: NextRequest) {
   const guard = await requireStaff("admin");
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const { searchParams } = new URL(req.url);
@@ -60,6 +60,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true, month, pending, total_pending, count: pending.length });
   } catch (err) {
     console.error("[overview] failed:", err);
-    return NextResponse.json({ ok: false, error: "Overview load nahi ho saka." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Could not load overview." }, { status: 500 });
   }
 }

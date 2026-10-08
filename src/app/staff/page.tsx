@@ -28,10 +28,10 @@ export default function StaffLoginPage() {
         router.push(j.staff?.role === "admin" ? "/staff/admin" : "/staff/attendance");
         router.refresh();
       } else {
-        setError(j.error || "Login nahi ho saka.");
+        setError(j.error || "Login failed.");
       }
     } catch {
-      setError("Login nahi ho saka. Dobara try karein.");
+      setError("Login failed. Please try again.");
     } finally {
       setBusy(false);
     }

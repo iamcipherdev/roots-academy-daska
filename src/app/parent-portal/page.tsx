@@ -27,22 +27,25 @@ export default function ParentPortalPage() {
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:py-16">
         {/* Hero */}
         <div className="text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
             <Search className="h-8 w-8" />
           </div>
-          <h1 className="mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl">
+          <p className="mt-5 text-xs font-bold uppercase tracking-[0.22em] text-primary">
+            Roots Academy · Daska
+          </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
             Parent Portal
           </h1>
-          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground sm:text-base">
-            Apne bache ka <span className="font-semibold text-foreground">roll number</span> likhein —
-            hazri, fee aur test results foran dekhain.
+          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Enter your child's <span className="font-semibold text-foreground">roll number</span> to
+            instantly see their attendance, fee status and test results.
           </p>
         </div>
 
         {/* Lookup card */}
-        <Card className="mt-8 rounded-2xl border-2 shadow-sm">
+        <Card className="mt-8 rounded-3xl border-border/60 shadow-xl shadow-black/5">
           <CardContent className="space-y-4 p-6 sm:p-8">
-            <label htmlFor="roll" className="text-sm font-bold">
+            <label htmlFor="roll" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Roll Number
             </label>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -54,21 +57,21 @@ export default function ParentPortalPage() {
                 placeholder="e.g. 12"
                 inputMode="text"
                 autoFocus
-                className={`h-14 rounded-xl text-center text-xl font-extrabold tracking-wide ${
+                className={`h-14 rounded-2xl text-center text-xl font-extrabold tracking-wide ${
                   touched && !rollNo.trim() ? "border-destructive" : ""
                 }`}
               />
-              <Button onClick={go} className="h-14 rounded-xl px-8 text-base font-bold sm:w-auto">
-                <Search className="mr-2 h-5 w-5" /> Dekhein
+              <Button onClick={go} className="h-14 rounded-2xl px-8 text-base font-bold shadow-lg shadow-primary/25 sm:w-auto">
+                <Search className="mr-2 h-5 w-5" /> View
               </Button>
             </div>
             {touched && !rollNo.trim() && (
               <p className="text-sm font-medium text-destructive">
-                Pehle roll number likhein.
+                Please enter a roll number first.
               </p>
             )}
             <p className="text-xs text-muted-foreground">
-              Roll number nahi maloom? Academy se rabta karein —{" "}
+              Don't know the roll number? Contact the academy —{" "}
               <a href="tel:03431298216" className="font-semibold text-primary underline underline-offset-2">
                 0343-1298216
               </a>
@@ -79,11 +82,11 @@ export default function ParentPortalPage() {
         {/* What you can see */}
         <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {[
-            { icon: CalendarDays, title: "Hazri", desc: "Is month ki attendance %" },
-            { icon: Wallet, title: "Fee", desc: "Paid / pending status" },
-            { icon: Trophy, title: "Results", desc: "Test marks aur position" },
+            { icon: CalendarDays, title: "Attendance", desc: "This month's attendance %" },
+            { icon: Wallet, title: "Fees", desc: "Paid / pending status" },
+            { icon: Trophy, title: "Results", desc: "Test marks & position" },
           ].map((f) => (
-            <Card key={f.title} className="rounded-2xl">
+            <Card key={f.title} className="rounded-2xl border-border/60 shadow-sm">
               <CardContent className="flex items-center gap-3 p-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <f.icon className="h-5 w-5" />
@@ -99,7 +102,7 @@ export default function ParentPortalPage() {
 
         <p className="mt-8 flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
           <Phone className="h-3.5 w-3.5" />
-          Koi masla ho to academy office se rabta karein.
+          Facing any issue? Please contact the academy office.
         </p>
       </main>
       <Footer />

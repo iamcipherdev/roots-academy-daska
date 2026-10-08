@@ -9,13 +9,13 @@ export async function GET(req: NextRequest) {
   const guard = await requireStaff();
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const { searchParams } = new URL(req.url);
     const class_id = searchParams.get("class_id");
     const month = searchParams.get("month") || currentMonthKey();
-    if (!class_id) return NextResponse.json({ ok: false, error: "class_id chahiye." }, { status: 400 });
+    if (!class_id) return NextResponse.json({ ok: false, error: "class_id is required." }, { status: 400 });
 
     const sb = supabaseAdmin();
     const { data: students } = await sb
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (err) {
     console.error("[fees GET] failed:", err);
-    return NextResponse.json({ ok: false, error: "Fee load nahi ho saki." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Could not load fees." }, { status: 500 });
   }
 }
 
@@ -82,13 +82,13 @@ export async function POST(req: NextRequest) {
   const guard = await requireStaff();
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const body = await req.json();
     const parsed = paySchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ ok: false, error: "Amount theek nahi hai." }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Invalid amount." }, { status: 400 });
     }
     const { session } = guard;
     const sb = supabaseAdmin();
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
       .eq("academy_id", session.academy_id)
       .maybeSingle();
     if (!student) {
-      return NextResponse.json({ ok: false, error: "Student nahi mila." }, { status: 404 });
+      return NextResponse.json({ ok: false, error: "Student not found." }, { status: 404 });
     }
 
     const { data: existing } = await sb
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
 
     if (!existing) {
       return NextResponse.json(
-        { ok: false, error: "Is month ki fee set nahi hai. Pehle admin se amount_due set karwaein." },
+        { ok: false, error: "Fee for this month is not set. Ask an admin to set the due amount first." },
         { status: 400 }
       );
     }
@@ -135,6 +135,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error("[fees POST] failed:", err);
-    return NextResponse.json({ ok: false, error: "Fee save nahi ho saki." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Could not save fee." }, { status: 500 });
   }
 }

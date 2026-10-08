@@ -21,13 +21,13 @@ export async function GET(req: NextRequest) {
   const guard = await requireStaff();
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const { searchParams } = new URL(req.url);
     const class_id = searchParams.get("class_id");
     const date = searchParams.get("date") || todayPKT();
-    if (!class_id) return NextResponse.json({ ok: false, error: "class_id chahiye." }, { status: 400 });
+    if (!class_id) return NextResponse.json({ ok: false, error: "class_id is required." }, { status: 400 });
 
     const sb = supabaseAdmin();
     const { data: students } = await sb
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true, date, marked });
   } catch (err) {
     console.error("[attendance GET] failed:", err);
-    return NextResponse.json({ ok: false, error: "Hazri load nahi ho saki." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Could not load attendance." }, { status: 500 });
   }
 }
 
@@ -58,13 +58,13 @@ export async function POST(req: NextRequest) {
   const guard = await requireStaff();
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const body = await req.json();
     const parsed = saveSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ ok: false, error: "Data theek nahi hai." }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Invalid data." }, { status: 400 });
     }
     const { session } = guard;
     const date = parsed.data.date || todayPKT();
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
         marked_by: session.staff_id,
       }));
     if (rows.length === 0) {
-      return NextResponse.json({ ok: false, error: "Koi valid student nahi mila." }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "No valid student found." }, { status: 400 });
     }
 
     const { error } = await sb
@@ -100,6 +100,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, date, present, absent, late, total: rows.length });
   } catch (err) {
     console.error("[attendance POST] failed:", err);
-    return NextResponse.json({ ok: false, error: "Hazri save nahi ho saki." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Could not save attendance." }, { status: 500 });
   }
 }

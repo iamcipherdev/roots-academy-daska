@@ -6,7 +6,7 @@ import { StaffHeader } from "@/components/portal/StaffHeader";
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { href: "/staff/attendance", label: "Hazri", adminOnly: false },
+  { href: "/staff/attendance", label: "Attendance", adminOnly: false },
   { href: "/staff/fees", label: "Fee", adminOnly: false },
   { href: "/staff/tests", label: "Tests", adminOnly: false },
   { href: "/staff/admin", label: "Admin", adminOnly: true },

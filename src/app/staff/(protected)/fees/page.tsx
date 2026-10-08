@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Wallet, MessageCircle, Plus, CircleCheck } from "lucide-react";
+import { Loader2, MessageCircle, Plus, CircleCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { currentMonthKey, monthLabel, toIntlPhone } from "@/lib/portal/dates";
+import { PortalHeader } from "@/components/portal/portal-header";
 
 interface FeeRow {
   student_id: string; name: string; roll_no: string; parent_phone: string | null;
@@ -66,10 +67,10 @@ export default function FeesPage() {
       });
       const j = await r.json();
       if (j.ok) {
-        setNotice(`${payFor.name} — Rs ${amt} jama. Baqi: Rs ${j.pending}.`);
+        setNotice(`${payFor.name} — Rs ${amt} received. Remaining: Rs ${j.pending}.`);
         setPayFor(null); setAmount(""); load();
-      } else setNotice(j.error || "Save nahi ho saka.");
-    } catch { setNotice("Save nahi ho saka."); }
+      } else setNotice(j.error || "Could not save.");
+    } catch { setNotice("Could not save."); }
     finally { setSaving(false); }
   };
 
@@ -78,8 +79,8 @@ export default function FeesPage() {
     if (!intl) return null;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
     const msg =
-      `Assalam-o-Alaikum! ${row.name} (Roll ${row.roll_no}) ki ${monthLabel(month)} fee ` +
-      `Rs ${row.pending} pending hai. Details: ${appUrl}/s/${encodeURIComponent(row.roll_no)} — ${academyName}`;
+      `Assalam-o-Alaikum! ${row.name} (Roll ${row.roll_no}) has a pending fee of ` +
+      `Rs ${row.pending} for ${monthLabel(month)}. Details: ${appUrl}/s/${encodeURIComponent(row.roll_no)} — ${academyName}`;
     return `https://wa.me/${intl}?text=${encodeURIComponent(msg)}`;
   };
 
@@ -88,12 +89,12 @@ export default function FeesPage() {
   const remindAll = () => {
     const targets = list.filter((r) => r.has_record && r.pending > 0 && toIntlPhone(r.parent_phone));
     if (targets.length === 0) return;
-    if (!window.confirm(`${targets.length} parents ko WhatsApp reminder kholna hai? Browser popup block kare to "Allow" dabayein.`)) return;
+    if (!window.confirm(`Open WhatsApp reminders for ${targets.length} parents? If the browser blocks popups, click "Allow".`)) return;
     targets.forEach((row, i) => {
       const link = remindLink(row);
       if (link) setTimeout(() => window.open(link, "_blank", "noopener"), i * 800);
     });
-    setNotice(`${targets.length} reminders khol diye — har chat me Send dabana hoga.`);
+    setNotice(`${targets.length} reminders opened — press Send in each chat.`);
   };
 
   if (loading) {
@@ -101,28 +102,29 @@ export default function FeesPage() {
   }
 
   return (
-    <div className="space-y-5">
-      <Card className="rounded-2xl">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <Wallet className="h-5 w-5 text-primary" /> Fee Jama Karein
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div className="space-y-6">
+      <PortalHeader
+        eyebrow="Finance"
+        title="Fee Collection"
+        description={`Collect payments and send WhatsApp reminders for ${monthLabel(month)}.`}
+      />
+
+      <Card className="rounded-2xl border-border/60 shadow-sm">
+        <CardContent className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center">
           <Select value={classId} onValueChange={setClassId}>
-            <SelectTrigger className="h-12 rounded-xl sm:w-56"><SelectValue placeholder="Class" /></SelectTrigger>
+            <SelectTrigger className="h-12 rounded-xl sm:w-56"><SelectValue placeholder="Select class" /></SelectTrigger>
             <SelectContent>
               {classes.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
             </SelectContent>
           </Select>
           <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="h-12 rounded-xl sm:w-48" />
           <div className="flex items-center gap-2 sm:ml-auto">
-            <div className="rounded-xl bg-red-50 px-4 py-2 text-sm font-bold text-red-800">
+            <div className="rounded-xl bg-red-50 px-4 py-2.5 text-sm font-bold text-red-800">
               Total pending: Rs {totalPending.toLocaleString()}
             </div>
             {pendingCount > 0 && (
               <Button onClick={remindAll} variant="outline" className="h-12 rounded-xl font-bold">
-                <MessageCircle className="mr-2 h-4 w-4" /> Sab ko Remind ({pendingCount})
+                <MessageCircle className="mr-2 h-4 w-4" /> Remind All ({pendingCount})
               </Button>
             )}
           </div>
@@ -137,12 +139,12 @@ export default function FeesPage() {
 
       <div className="space-y-2.5">
         {list.map((row) => (
-          <Card key={row.student_id} className="rounded-2xl">
-            <CardContent className="flex items-center gap-3 py-3.5">
+          <Card key={row.student_id} className="rounded-2xl border-border/60 shadow-sm transition-shadow hover:shadow-md">
+            <CardContent className="flex items-center gap-3 py-4">
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-bold">{row.name} <span className="font-normal text-muted-foreground">· Roll {row.roll_no}</span></div>
                 <div className="mt-0.5 text-xs text-muted-foreground">
-                  {row.has_record ? <>Rs {row.amount_paid.toLocaleString()} jama / Rs {row.amount_due.toLocaleString()}</> : "Fee set nahi hai"}
+                  {row.has_record ? <>Rs {row.amount_paid.toLocaleString()} paid / Rs {row.amount_due.toLocaleString()}</> : "Fee not set for this student"}
                 </div>
               </div>
               {row.has_record && row.pending <= 0 ? (
@@ -160,35 +162,35 @@ export default function FeesPage() {
                       </a>
                     </Button>
                   ) : (
-                    <Button size="sm" variant="outline" disabled className="rounded-xl" title="Parent ka number nahi hai">
+                    <Button size="sm" variant="outline" disabled className="rounded-xl" title="No parent number on file">
                       <MessageCircle className="mr-1 h-4 w-4" /> Remind
                     </Button>
                   );
                 })()}
                 <Button size="sm" className="rounded-xl" onClick={() => { setPayFor(row); setAmount(""); setNotice(""); }}>
-                  <Plus className="mr-1 h-4 w-4" /> Jama
+                  <Plus className="mr-1 h-4 w-4" /> Collect
                 </Button>
               </div>
             </CardContent>
           </Card>
         ))}
         {list.length === 0 && (
-          <Card className="rounded-2xl"><CardContent className="py-12 text-center text-muted-foreground">Is class mein koi student nahi.</CardContent></Card>
+          <Card className="rounded-2xl"><CardContent className="py-12 text-center text-muted-foreground">No students in this class.</CardContent></Card>
         )}
       </div>
 
       <Dialog open={!!payFor} onOpenChange={(o) => !o && setPayFor(null)}>
         <DialogContent className="rounded-2xl sm:max-w-sm">
-          <DialogHeader><DialogTitle>Fee jama karein</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Collect fee</DialogTitle></DialogHeader>
           {payFor && (
             <div className="space-y-4">
               <p className="text-sm"><span className="font-bold">{payFor.name}</span> <span className="text-muted-foreground">(Roll {payFor.roll_no})</span>
-                <span className="block text-xs">Baqi: Rs {payFor.pending.toLocaleString()} / Rs {payFor.amount_due.toLocaleString()}</span></p>
+                <span className="block text-xs">Remaining: Rs {payFor.pending.toLocaleString()} / Rs {payFor.amount_due.toLocaleString()}</span></p>
               <Input value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^0-9]/g, ""))}
-                placeholder="Kitne rupe mile?" inputMode="numeric" className="h-14 rounded-xl text-center text-2xl font-extrabold" autoFocus />
+                placeholder="Amount received (Rs)" inputMode="numeric" className="h-14 rounded-xl text-center text-2xl font-extrabold" autoFocus />
               <DialogFooter>
                 <Button onClick={recordPayment} disabled={saving || !parseInt(amount, 10)} className="h-12 w-full rounded-xl font-bold">
-                  {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : `Rs ${amount || 0} Jama Karein`}
+                  {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : `Collect Rs ${amount || 0}`}
                 </Button>
               </DialogFooter>
             </div>

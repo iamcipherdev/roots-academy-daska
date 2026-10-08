@@ -9,12 +9,12 @@ const loginSchema = z.object({
   pin: z.string().trim().min(4).max(12),
 });
 
-const GENERIC_ERROR = "Phone number ya PIN ghalat hai.";
+const GENERIC_ERROR = "Incorrect phone number or PIN.";
 
 export async function POST(req: NextRequest) {
   try {
     if (!isPortalConfigured()) {
-      return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+      return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
     }
     const body = await req.json();
     const parsed = loginSchema.safeParse(body);
@@ -56,6 +56,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error("[portal login] failed:", err);
-    return NextResponse.json({ ok: false, error: "Login nahi ho saka. Dobara try karein." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Login failed. Please try again." }, { status: 500 });
   }
 }

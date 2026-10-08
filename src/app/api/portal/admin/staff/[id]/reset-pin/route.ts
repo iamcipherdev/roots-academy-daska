@@ -12,7 +12,7 @@ export async function POST(
   const guard = await requireStaff("admin");
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const { id } = await params;
@@ -33,11 +33,11 @@ export async function POST(
       .select("id, name");
     if (error) throw error;
     if (!data || data.length === 0) {
-      return NextResponse.json({ ok: false, error: "Staff nahi mila." }, { status: 404 });
+      return NextResponse.json({ ok: false, error: "Staff not found." }, { status: 404 });
     }
     return NextResponse.json({ ok: true, name: (data[0] as { name: string }).name });
   } catch (err) {
     console.error("[reset-pin] failed:", err);
-    return NextResponse.json({ ok: false, error: "PIN reset nahi ho saka." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Could not reset PIN." }, { status: 500 });
   }
 }

@@ -13,12 +13,12 @@ export async function GET(
 ) {
   try {
     if (!isPortalConfigured()) {
-      return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+      return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
     }
     const { rollno } = await params;
     const rollNo = decodeURIComponent(rollno).trim();
     if (!rollNo) {
-      return NextResponse.json({ ok: false, error: "Roll number likhein." }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Enter the roll number." }, { status: 400 });
     }
 
     const sb = supabaseAdmin();
@@ -150,6 +150,6 @@ export async function GET(
     });
   } catch (err) {
     console.error("[parent] failed:", err);
-    return NextResponse.json({ ok: false, error: "Kuch ghalat ho gaya. Dobara try karein." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

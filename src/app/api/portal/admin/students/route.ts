@@ -8,7 +8,7 @@ export async function GET() {
   const guard = await requireStaff("admin");
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const { session } = guard;
@@ -55,7 +55,7 @@ export async function GET() {
     return NextResponse.json({ ok: true, month, classes: out });
   } catch (err) {
     console.error("[admin students] failed:", err);
-    return NextResponse.json({ ok: false, error: "Students load nahi ho sake." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Could not load students." }, { status: 500 });
   }
 }
 
@@ -64,13 +64,13 @@ export async function POST(req: NextRequest) {
   const guard = await requireStaff("admin");
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const body = await req.json();
     const rows = body?.rows;
     if (!Array.isArray(rows) || rows.length === 0 || rows.length > 1000) {
-      return NextResponse.json({ ok: false, error: "Rows 1–1000 ke darmiyan honi chahiye." }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Rows must be between 1 and 1000." }, { status: 400 });
     }
     const { session } = guard;
     const sb = supabaseAdmin();
@@ -116,11 +116,11 @@ export async function POST(req: NextRequest) {
       const rollNo = String(r?.roll_no ?? "").trim();
       const parentPhone = String(r?.parent_phone ?? "").trim() || null;
 
-      if (!name) { results.push({ row: rowNo, ok: false, error: "Naam khaali hai." }); continue; }
-      if (!className || !classMap.has(className)) { results.push({ row: rowNo, ok: false, error: "Class ka naam theek nahi." }); continue; }
-      if (!rollNo) { results.push({ row: rowNo, ok: false, error: "Roll number khaali hai." }); continue; }
+      if (!name) { results.push({ row: rowNo, ok: false, error: "Name is required." }); continue; }
+      if (!className || !classMap.has(className)) { results.push({ row: rowNo, ok: false, error: "Invalid class name." }); continue; }
+      if (!rollNo) { results.push({ row: rowNo, ok: false, error: "Roll number is required." }); continue; }
       if (taken.has(rollNo) || seenInFile.has(rollNo)) {
-        results.push({ row: rowNo, ok: false, error: `Roll number ${rollNo} pehle se mojood hai — skip.` });
+        results.push({ row: rowNo, ok: false, error: `Roll number ${rollNo} already exists — skipped.` });
         continue;
       }
 
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
         parent_phone: parentPhone,
       });
       if (error) {
-        results.push({ row: rowNo, ok: false, error: "Save nahi ho saka." });
+        results.push({ row: rowNo, ok: false, error: "Could not save." });
         continue;
       }
       taken.add(rollNo);
@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, imported, skipped: rows.length - imported, results });
   } catch (err) {
     console.error("[admin import] failed:", err);
-    return NextResponse.json({ ok: false, error: "Import nahi ho saka." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Import failed." }, { status: 500 });
   }
 }
 
@@ -153,7 +153,7 @@ export async function DELETE(req: NextRequest) {
   const guard = await requireStaff("admin");
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const id = new URL(req.url).searchParams.get("id")?.trim();
@@ -169,7 +169,7 @@ export async function DELETE(req: NextRequest) {
       .eq("academy_id", session.academy_id)
       .maybeSingle();
     if (!st) {
-      return NextResponse.json({ ok: false, error: "Student nahi mila." }, { status: 404 });
+      return NextResponse.json({ ok: false, error: "Student not found." }, { status: 404 });
     }
     for (const table of ["attendance", "fees", "marks"]) {
       const { error } = await sb.from(table).delete().eq("student_id", id);
@@ -180,6 +180,6 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ ok: true, name: st.name });
   } catch (err) {
     console.error("[admin students DELETE] failed:", err);
-    return NextResponse.json({ ok: false, error: "Delete nahi ho saka." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Could not delete." }, { status: 500 });
   }
 }

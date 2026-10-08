@@ -16,7 +16,7 @@ export async function GET() {
   const guard = await requireStaff("admin");
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const { data, error } = await supabaseAdmin()
@@ -28,7 +28,7 @@ export async function GET() {
     return NextResponse.json({ ok: true, staff: data ?? [] });
   } catch (err) {
     console.error("[admin staff GET] failed:", err);
-    return NextResponse.json({ ok: false, error: "Staff load nahi ho saka." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Could not load staff." }, { status: 500 });
   }
 }
 
@@ -37,13 +37,13 @@ export async function POST(req: NextRequest) {
   const guard = await requireStaff("admin");
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const body = await req.json();
     const parsed = addSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ ok: false, error: "Naam, phone aur PIN theek likhein." }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Enter a valid name, phone and PIN." }, { status: 400 });
     }
     const phone = parsed.data.phone.replace(/[\s\-()]/g, "");
     const salt = newSalt();
@@ -63,13 +63,13 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       if (String(error.message).includes("duplicate") || (error as { code?: string }).code === "23505") {
-        return NextResponse.json({ ok: false, error: "Ye phone number pehle se registered hai." }, { status: 409 });
+        return NextResponse.json({ ok: false, error: "This phone number is already registered." }, { status: 409 });
       }
       throw error;
     }
     return NextResponse.json({ ok: true, staff: data });
   } catch (err) {
     console.error("[admin staff POST] failed:", err);
-    return NextResponse.json({ ok: false, error: "Staff add nahi ho saka." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Could not add staff." }, { status: 500 });
   }
 }

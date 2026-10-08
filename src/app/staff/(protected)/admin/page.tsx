@@ -82,10 +82,10 @@ export default function AdminPage() {
 
   const parseCSV = () => {
     const lines = csv.split("\n").map((l) => l.trim()).filter(Boolean);
-    if (lines.length < 2) { setNotice("CSV mein header + kam az kam 1 row ho."); return; }
+    if (lines.length < 2) { setNotice("CSV must have a header + at least 1 row."); return; }
     const header = lines[0].split(",").map((h) => h.trim().toLowerCase());
     const idx = (n: string) => header.indexOf(n);
-    if (idx("name") < 0 || idx("roll_no") < 0) { setNotice("Header mein name, class_name, roll_no, parent_phone honay chahiye."); return; }
+    if (idx("name") < 0 || idx("roll_no") < 0) { setNotice("Header must contain name, class_name, roll_no, parent_phone."); return; }
     const rows = lines.slice(1).map((l) => {
       const c = l.split(",").map((x) => x.trim());
       return { name: c[idx("name")] ?? "", class_name: c[idx("class_name")] ?? "", roll_no: c[idx("roll_no")] ?? "", parent_phone: c[idx("parent_phone")] ?? "" };
@@ -103,8 +103,8 @@ export default function AdminPage() {
       });
       const j = await r.json();
       if (j.ok) { setImportResult(j); setPreview(null); setCsv(""); loadStudents(); }
-      else setNotice(j.error || "Import nahi ho saka.");
-    } catch { setNotice("Import nahi ho saka."); }
+      else setNotice(j.error || "Import failed.");
+    } catch { setNotice("Import failed."); }
     finally { setImporting(false); }
   };
 
@@ -115,10 +115,10 @@ export default function AdminPage() {
       const r = await fetch(`/api/portal/admin/students?id=${encodeURIComponent(delStudent.id)}`, { method: "DELETE" });
       const j = await r.json();
       if (j.ok) {
-        setNotice(`${delStudent.name} delete ho gaya.`);
+        setNotice(`${delStudent.name} has been deleted.`);
         setDelStudent(null); loadStudents();
-      } else setNotice(j.error || "Delete nahi ho saka.");
-    } catch { setNotice("Delete nahi ho saka."); }
+      } else setNotice(j.error || "Could not delete.");
+    } catch { setNotice("Could not delete."); }
     finally { setDeleting(false); }
   };
 
@@ -130,9 +130,9 @@ export default function AdminPage() {
         body: JSON.stringify({ name: sName.trim(), phone: sPhone.trim(), pin: sPin.trim(), role: sRole }),
       });
       const j = await r.json();
-      if (j.ok) { setShowAdd(false); setSName(""); setSPhone(""); setSPin(""); loadStaff(); setNotice(`${j.staff.name} add ho gaya.`); }
-      else setNotice(j.error || "Add nahi ho saka.");
-    } catch { setNotice("Add nahi ho saka."); }
+      if (j.ok) { setShowAdd(false); setSName(""); setSPhone(""); setSPin(""); loadStaff(); setNotice(`${j.staff.name} has been added.`); }
+      else setNotice(j.error || "Could not add.");
+    } catch { setNotice("Could not add."); }
     finally { setAdding(false); }
   };
 
@@ -143,8 +143,8 @@ export default function AdminPage() {
       body: JSON.stringify({ pin: newPin }),
     });
     const j = await r.json();
-    if (j.ok) { setNotice(`${resetFor.name} ka naya PIN set ho gaya: ${newPin} (sirf ek dafa dikh raha hai)`); setResetFor(null); setNewPin(""); }
-    else setNotice(j.error || "PIN reset nahi ho saka.");
+    if (j.ok) { setNotice(`New PIN for ${resetFor.name}: ${newPin} (shown only once)`); setResetFor(null); setNewPin(""); }
+    else setNotice(j.error || "Could not reset PIN.");
   };
 
   const setDues = async () => {
@@ -155,8 +155,8 @@ export default function AdminPage() {
       body: JSON.stringify({ class_id: dueClass, month, amount_due: amt }),
     });
     const j = await r.json();
-    if (j.ok) { setNotice(`${j.updated} students ki ${monthLabel(month)} fee Rs ${amt} set ho gayi.`); loadOverview(month); loadStudents(); }
-    else setNotice(j.error || "Fee set nahi ho saki.");
+    if (j.ok) { setNotice(`Fee of Rs ${amt} set for ${j.updated} students (${monthLabel(month)}).`); loadOverview(month); loadStudents(); }
+    else setNotice(j.error || "Could not set fee.");
   };
 
   if (loading) {
@@ -192,14 +192,14 @@ export default function AdminPage() {
                   <div key={s.id} className="flex items-center justify-between gap-2 rounded-lg bg-muted/50 px-3 py-2 text-sm">
                     <span className="min-w-0 flex-1 truncate font-medium">Roll {s.roll_no} · {s.name}</span>
                     <Badge className={`border ${chipStyles[s.fee_chip]}`}>{chipLabel[s.fee_chip]}</Badge>
-                    <Button size="icon" variant="ghost" title="Student delete karein"
+                    <Button size="icon" variant="ghost" title="Delete student"
                       className="h-8 w-8 shrink-0 rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
                       onClick={() => setDelStudent(s)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
-                {c.students.length === 0 && <p className="text-sm text-muted-foreground">Koi student nahi.</p>}
+                {c.students.length === 0 && <p className="text-sm text-muted-foreground">No students yet.</p>}
               </CardContent>
             </Card>
           ))}
@@ -209,10 +209,10 @@ export default function AdminPage() {
           <Card className="rounded-2xl">
             <CardHeader><CardTitle className="text-base">CSV Import</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-xs text-muted-foreground">Columns: <code className="rounded bg-muted px-1">name,class_name,roll_no,parent_phone</code> — pehle preview dekhein, phir confirm karein.</p>
+              <p className="text-xs text-muted-foreground">Columns: <code className="rounded bg-muted px-1">name,class_name,roll_no,parent_phone</code> — preview first, then confirm.</p>
               <Textarea value={csv} onChange={(e) => setCsv(e.target.value)} rows={6}
                 placeholder={"name,class_name,roll_no,parent_phone\nAhmed Raza,8-A,1,03001234567"} className="rounded-xl font-mono text-xs" />
-              <Button onClick={parseCSV} variant="outline" className="rounded-xl font-bold">Preview Dekhein</Button>
+              <Button onClick={parseCSV} variant="outline" className="rounded-xl font-bold">Preview</Button>
 
               {preview && (
                 <div className="space-y-3">
@@ -225,7 +225,7 @@ export default function AdminPage() {
                     </table>
                   </div>
                   <Button onClick={doImport} disabled={importing} className="h-12 w-full rounded-xl font-bold">
-                    {importing ? <Loader2 className="h-5 w-5 animate-spin" /> : `${preview.length} Students Import Karein`}
+                    {importing ? <Loader2 className="h-5 w-5 animate-spin" /> : `Import ${preview.length} Students`}
                   </Button>
                 </div>
               )}
@@ -245,7 +245,7 @@ export default function AdminPage() {
         </TabsContent>
 
         <TabsContent value="staff" className="mt-5 space-y-3">
-          <Button onClick={() => setShowAdd(true)} className="rounded-xl font-bold"><UserPlus className="mr-2 h-4 w-4" /> Teacher Add Karein</Button>
+          <Button onClick={() => setShowAdd(true)} className="rounded-xl font-bold"><UserPlus className="mr-2 h-4 w-4" /> Add Teacher</Button>
           {staff.map((s) => (
             <Card key={s.id} className="rounded-2xl">
               <CardContent className="flex items-center gap-3 py-3">
@@ -262,7 +262,7 @@ export default function AdminPage() {
 
         <TabsContent value="fees" className="mt-5 space-y-4">
           <Card className="rounded-2xl">
-            <CardHeader className="pb-2"><CardTitle className="text-base">Monthly Fee Set Karein</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Set Monthly Fee</CardTitle></CardHeader>
             <CardContent className="flex flex-col gap-3 sm:flex-row">
               <Select value={dueClass} onValueChange={setDueClass}>
                 <SelectTrigger className="h-12 rounded-xl sm:w-48"><SelectValue placeholder="Class" /></SelectTrigger>
@@ -271,13 +271,13 @@ export default function AdminPage() {
               <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="h-12 rounded-xl sm:w-44" />
               <Input value={dueAmount} onChange={(e) => setDueAmount(e.target.value.replace(/[^0-9]/g, ""))}
                 placeholder="Amount (Rs)" inputMode="numeric" className="h-12 rounded-xl sm:w-44" />
-              <Button onClick={setDues} className="h-12 rounded-xl font-bold">Set Karein</Button>
+              <Button onClick={setDues} className="h-12 rounded-xl font-bold">Set Fee</Button>
             </CardContent>
           </Card>
 
           <Card className="rounded-2xl border-2 border-red-200">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Kis ne fee nahi di — {monthLabel(month)}</CardTitle>
+              <CardTitle className="text-base">Unpaid Fees — {monthLabel(month)}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="mb-3 rounded-xl bg-red-50 p-4 text-center">
@@ -300,9 +300,9 @@ export default function AdminPage() {
 
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
         <DialogContent className="rounded-2xl sm:max-w-sm">
-          <DialogHeader><DialogTitle>Teacher Add Karein</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Add Teacher</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <Input value={sName} onChange={(e) => setSName(e.target.value)} placeholder="Naam" className="h-12 rounded-xl" />
+            <Input value={sName} onChange={(e) => setSName(e.target.value)} placeholder="Name" className="h-12 rounded-xl" />
             <Input value={sPhone} onChange={(e) => setSPhone(e.target.value)} placeholder="Phone (03XXXXXXXXX)" inputMode="tel" className="h-12 rounded-xl" />
             <Input value={sPin} onChange={(e) => setSPin(e.target.value.replace(/[^0-9]/g, ""))} placeholder="PIN (4-12 digits)" inputMode="numeric" type="password" className="h-12 rounded-xl" />
             <Select value={sRole} onValueChange={setSRole}>
@@ -311,7 +311,7 @@ export default function AdminPage() {
             </Select>
             <DialogFooter>
               <Button onClick={addStaff} disabled={adding} className="h-12 w-full rounded-xl font-bold">
-                {adding ? <Loader2 className="h-5 w-5 animate-spin" /> : "Add Karein"}
+                {adding ? <Loader2 className="h-5 w-5 animate-spin" /> : "Add"}
               </Button>
             </DialogFooter>
           </div>
@@ -321,18 +321,18 @@ export default function AdminPage() {
       <AlertDialog open={!!delStudent} onOpenChange={(o) => !o && setDelStudent(null)}>
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Student delete karein?</AlertDialogTitle>
+            <AlertDialogTitle>Delete student?</AlertDialogTitle>
             <AlertDialogDescription>
               <span className="font-bold text-foreground">{delStudent?.name}</span> (Roll {delStudent?.roll_no}) ka
-              record, hazri, fee aur results <span className="font-bold text-destructive">hamesha ke liye delete</span> ho
-              jayenge. Ye wapas nahi ho sakta.
+              their attendance, fee and result records will be <span className="font-bold text-destructive">permanently deleted</span>.
+              This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl">Rehne Dein</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={deleteStudent} disabled={deleting}
               className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete Karein"}
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -343,10 +343,10 @@ export default function AdminPage() {
           <DialogHeader><DialogTitle>PIN Reset — {resetFor?.name}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <Input value={newPin} onChange={(e) => setNewPin(e.target.value.replace(/[^0-9]/g, ""))}
-              placeholder="Naya PIN (4-12 digits)" inputMode="numeric" type="password" className="h-12 rounded-xl text-center text-xl tracking-[0.5em]" />
+              placeholder="New PIN (4-12 digits)" inputMode="numeric" type="password" className="h-12 rounded-xl text-center text-xl tracking-[0.5em]" />
             <p className="text-xs text-muted-foreground">Naya PIN sirf ek dafa dikhega — teacher ko foran bata dein.</p>
             <DialogFooter>
-              <Button onClick={resetPin} disabled={!/^[0-9]{4,12}$/.test(newPin)} className="h-12 w-full rounded-xl font-bold">PIN Set Karein</Button>
+              <Button onClick={resetPin} disabled={!/^[0-9]{4,12}$/.test(newPin)} className="h-12 w-full rounded-xl font-bold">Set PIN</Button>
             </DialogFooter>
           </div>
         </DialogContent>
@@ -366,7 +366,7 @@ function AddStudentCard({ classes, onDone }: { classes: ClassInfo[]; onDone: () 
   const submit = async () => {
     const n = name.trim();
     if (!n || !className || !rollNo.trim()) {
-      setMsg({ ok: false, text: "Naam, class aur roll number zaroori hain." });
+      setMsg({ ok: false, text: "Name, class and roll number are required." });
       return;
     }
     setSaving(true); setMsg(null);
@@ -379,13 +379,13 @@ function AddStudentCard({ classes, onDone }: { classes: ClassInfo[]; onDone: () 
       const j = await r.json();
       const first = j?.results?.[0];
       if (j.ok && first?.ok) {
-        setMsg({ ok: true, text: `${n} add ho gaya.` });
+        setMsg({ ok: true, text: `${n} added.` });
         setName(""); setRollNo(""); setPhone(""); onDone();
       } else {
-        setMsg({ ok: false, text: first?.error || j.error || "Add nahi ho saka." });
+        setMsg({ ok: false, text: first?.error || j.error || "Could not add." });
       }
     } catch {
-      setMsg({ ok: false, text: "Add nahi ho saka." });
+      setMsg({ ok: false, text: "Could not add." });
     } finally { setSaving(false); }
   };
 
@@ -393,7 +393,7 @@ function AddStudentCard({ classes, onDone }: { classes: ClassInfo[]; onDone: () 
     <Card className="rounded-2xl">
       <CardHeader className="pb-2"><CardTitle className="text-base">Naya Student</CardTitle></CardHeader>
       <CardContent className="space-y-3">
-        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Student ka naam" className="h-12 rounded-xl" />
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Student name" className="h-12 rounded-xl" />
         <div className="grid grid-cols-2 gap-3">
           <Select value={className} onValueChange={setClassName}>
             <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder="Class" /></SelectTrigger>
@@ -408,7 +408,7 @@ function AddStudentCard({ classes, onDone }: { classes: ClassInfo[]; onDone: () 
           <p className={`text-sm font-semibold ${msg.ok ? "text-emerald-700" : "text-red-700"}`}>{msg.text}</p>
         )}
         <Button onClick={submit} disabled={saving} className="h-12 w-full rounded-xl font-bold">
-          {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : "Student Add Karein"}
+          {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : "Add Student"}
         </Button>
       </CardContent>
     </Card>
@@ -422,7 +422,7 @@ function AddClassCard({ onDone }: { onDone: () => void }) {
 
   const submit = async () => {
     const n = name.trim();
-    if (!n) { setMsg({ ok: false, text: "Class ka naam likhein." }); return; }
+    if (!n) { setMsg({ ok: false, text: "Enter the class name." }); return; }
     setSaving(true); setMsg(null);
     try {
       const r = await fetch("/api/portal/classes", {
@@ -432,13 +432,13 @@ function AddClassCard({ onDone }: { onDone: () => void }) {
       });
       const j = await r.json();
       if (j.ok) {
-        setMsg({ ok: true, text: `Class "${n}" add ho gayi.` });
+        setMsg({ ok: true, text: `Class "${n}" added.` });
         setName(""); onDone();
       } else {
-        setMsg({ ok: false, text: j.error || "Add nahi ho saki." });
+        setMsg({ ok: false, text: j.error || "Could not add." });
       }
     } catch {
-      setMsg({ ok: false, text: "Add nahi ho saki." });
+      setMsg({ ok: false, text: "Could not add." });
     } finally { setSaving(false); }
   };
 
@@ -452,9 +452,9 @@ function AddClassCard({ onDone }: { onDone: () => void }) {
           <p className={`text-sm font-semibold ${msg.ok ? "text-emerald-700" : "text-red-700"}`}>{msg.text}</p>
         )}
         <Button onClick={submit} disabled={saving} variant="outline" className="h-12 w-full rounded-xl font-bold">
-          {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : "Class Add Karein"}
+          {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : "Add Class"}
         </Button>
-        <p className="text-xs text-muted-foreground">Zyada students ek sath add karne hon to neeche CSV Import use karein.</p>
+        <p className="text-xs text-muted-foreground">To add many students at once, use CSV Import below.</p>
       </CardContent>
     </Card>
   );

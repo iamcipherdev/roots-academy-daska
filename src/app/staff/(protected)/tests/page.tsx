@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, Plus, Trash2, Save, CircleCheck, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { PortalHeader } from "@/components/portal/portal-header";
 
 interface Student { id: string; name: string; roll_no: string }
 interface ClassInfo { id: string; name: string; students: Student[] }
@@ -84,8 +85,8 @@ export default function TestsPage() {
         setShowCreate(false); setExamName(""); setSubjects([{ subject: "", total: 100 }]);
         loadExams(classId);
         setTimeout(() => setExamId(j.exam.id), 100);
-      } else setNotice(j.error || "Test create nahi ho saka.");
-    } catch { setNotice("Test create nahi ho saka."); }
+      } else setNotice(j.error || "Could not create test.");
+    } catch { setNotice("Could not create test."); }
     finally { setCreating(false); }
   };
 
@@ -105,8 +106,8 @@ export default function TestsPage() {
         body: JSON.stringify({ exam_id: exam.id, subjects: exam.subjects, rows }),
       });
       const j = await r.json();
-      setNotice(j.ok ? `${cls.students.length} students ke marks save ho gaye.` : (j.error || "Save nahi ho sake."));
-    } catch { setNotice("Save nahi ho sake."); }
+      setNotice(j.ok ? `Marks saved for ${cls.students.length} students.` : (j.error || "Could not save."));
+    } catch { setNotice("Could not save."); }
     finally { setSaving(false); }
   };
 
@@ -115,24 +116,25 @@ export default function TestsPage() {
   }
 
   return (
-    <div className="space-y-5">
-      <Card className="rounded-2xl">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <FileText className="h-5 w-5 text-primary" /> Marks Dalein
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3 sm:flex-row">
+    <div className="space-y-6">
+      <PortalHeader
+        eyebrow="Assessment"
+        title="Tests & Marks"
+        description="Create a test, then enter marks per student. Press Enter to jump to the next student."
+      />
+
+      <Card className="rounded-2xl border-border/60 shadow-sm">
+        <CardContent className="flex flex-col gap-3 py-5 sm:flex-row">
           <Select value={classId} onValueChange={setClassId}>
-            <SelectTrigger className="h-12 rounded-xl sm:w-52"><SelectValue placeholder="Class" /></SelectTrigger>
+            <SelectTrigger className="h-12 rounded-xl sm:w-52"><SelectValue placeholder="Select class" /></SelectTrigger>
             <SelectContent>{classes.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={examId} onValueChange={setExamId}>
-            <SelectTrigger className="h-12 rounded-xl sm:flex-1"><SelectValue placeholder="Test select karein" /></SelectTrigger>
+            <SelectTrigger className="h-12 rounded-xl sm:flex-1"><SelectValue placeholder="Select a test" /></SelectTrigger>
             <SelectContent>{exams.map((e) => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}</SelectContent>
           </Select>
           <Button variant="outline" className="h-12 rounded-xl font-bold" onClick={() => setShowCreate(true)}>
-            <Plus className="mr-1 h-4 w-4" /> Naya Test
+            <Plus className="mr-1 h-4 w-4" /> New Test
           </Button>
         </CardContent>
       </Card>
@@ -147,9 +149,9 @@ export default function TestsPage() {
         <>
           <div className="space-y-2.5">
             {cls.students.map((s) => (
-              <Card key={s.id} className="rounded-2xl">
-                <CardContent className="py-3">
-                  <div className="mb-2 text-sm font-bold">Roll {s.roll_no} · {s.name}</div>
+              <Card key={s.id} className="rounded-2xl border-border/60 shadow-sm">
+                <CardContent className="py-4">
+                  <div className="mb-2.5 text-sm font-bold">Roll {s.roll_no} · {s.name}</div>
                   <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${exam.subjects.length}, minmax(0,1fr))` }}>
                     {exam.subjects.map((sub) => (
                       <div key={sub.subject}>
@@ -173,23 +175,23 @@ export default function TestsPage() {
           </div>
           <div className="sticky bottom-4">
             <Button onClick={saveMarks} disabled={saving} className="h-14 w-full rounded-2xl text-base font-bold shadow-xl shadow-primary/25">
-              {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Save className="mr-2 h-5 w-5" /> Marks Save Karein</>}
+              {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Save className="mr-2 h-5 w-5" /> Save Marks</>}
             </Button>
           </div>
         </>
       )}
       {classId && exams.length === 0 && (
         <Card className="rounded-2xl"><CardContent className="py-12 text-center text-muted-foreground">
-          Is class ka koi test nahi hai. “Naya Test” se banayein.
+          This class has no tests yet. Create one with “New Test”.
         </CardContent></Card>
       )}
 
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent className="rounded-2xl sm:max-w-md">
-          <DialogHeader><DialogTitle>Naya Test Banayein</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Create a new test</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <Input value={examName} onChange={(e) => setExamName(e.target.value)}
-              placeholder="Test ka naam (e.g. Weekly Test - Maths)" className="h-12 rounded-xl" />
+              placeholder="Test name (e.g. Weekly Test - Maths)" className="h-12 rounded-xl" />
             <div className="space-y-2">
               {subjects.map((s, i) => (
                 <div key={i} className="flex gap-2">
@@ -205,12 +207,12 @@ export default function TestsPage() {
                 </div>
               ))}
               <Button variant="outline" size="sm" className="rounded-xl" onClick={() => setSubjects([...subjects, { subject: "", total: 100 }])}>
-                <Plus className="mr-1 h-4 w-4" /> Subject add karein
+                <Plus className="mr-1 h-4 w-4" /> Add subject
               </Button>
             </div>
             <DialogFooter>
               <Button onClick={createExam} disabled={creating || !examName.trim()} className="h-12 w-full rounded-xl font-bold">
-                {creating ? <Loader2 className="h-5 w-5 animate-spin" /> : "Test Banayein"}
+                {creating ? <Loader2 className="h-5 w-5 animate-spin" /> : "Create Test"}
               </Button>
             </DialogFooter>
           </div>

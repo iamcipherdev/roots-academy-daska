@@ -14,13 +14,13 @@ export async function POST(req: NextRequest) {
   const guard = await requireStaff("admin");
   if ("response" in guard) return guard.response;
   if (!isPortalConfigured()) {
-    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
   }
   try {
     const body = await req.json();
     const parsed = dueSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ ok: false, error: "Class, month aur amount theek likhein." }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Enter a valid class, month and amount." }, { status: 400 });
     }
     const { session } = guard;
     const sb = supabaseAdmin();
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       .eq("academy_id", session.academy_id);
     const ids = (students ?? []).map((s) => s.id as string);
     if (ids.length === 0) {
-      return NextResponse.json({ ok: false, error: "Is class mein koi student nahi." }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "No students in this class." }, { status: 400 });
     }
 
     const rows = ids.map((student_id) => ({
@@ -50,6 +50,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, updated: ids.length });
   } catch (err) {
     console.error("[fee-due] failed:", err);
-    return NextResponse.json({ ok: false, error: "Fee set nahi ho saki." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Could not set fee." }, { status: 500 });
   }
 }
