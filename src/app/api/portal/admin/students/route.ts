@@ -183,3 +183,80 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Could not delete." }, { status: 500 });
   }
 }
+
+/** PATCH /api/portal/admin/students — update a student (admin only). */
+export async function PATCH(req: NextRequest) {
+  const guard = await requireStaff("admin");
+  if ("response" in guard) return guard.response;
+  if (!isPortalConfigured()) {
+    return NextResponse.json({ ok: false, error: "Database not connected." }, { status: 503 });
+  }
+  try {
+    const body = await req.json();
+    const id = String(body?.id ?? "").trim();
+    if (!id) {
+      return NextResponse.json({ ok: false, error: "Student id missing." }, { status: 400 });
+    }
+    const { session } = guard;
+    const sb = supabaseAdmin();
+
+    const { data: st } = await sb
+      .from("students")
+      .select("id, academy_id")
+      .eq("id", id)
+      .eq("academy_id", session.academy_id)
+      .maybeSingle();
+    if (!st) {
+      return NextResponse.json({ ok: false, error: "Student not found." }, { status: 404 });
+    }
+
+    const patch: Record<string, string | null> = {};
+    if (body.name !== undefined) {
+      const name = String(body.name).trim();
+      if (!name) return NextResponse.json({ ok: false, error: "Name is required." }, { status: 400 });
+      patch.name = name;
+    }
+    if (body.roll_no !== undefined) {
+      const rollNo = String(body.roll_no).trim();
+      if (!rollNo) return NextResponse.json({ ok: false, error: "Roll number is required." }, { status: 400 });
+      const { data: dup } = await sb
+        .from("students")
+        .select("id")
+        .eq("academy_id", session.academy_id)
+        .eq("roll_no", rollNo)
+        .neq("id", id)
+        .maybeSingle();
+      if (dup) {
+        return NextResponse.json({ ok: false, error: `Roll number ${rollNo} is already in use.` }, { status: 409 });
+      }
+      patch.roll_no = rollNo;
+    }
+    if (body.class_id !== undefined) {
+      const classId = String(body.class_id).trim();
+      if (classId) {
+        const { data: cls } = await sb
+          .from("classes")
+          .select("id")
+          .eq("id", classId)
+          .eq("academy_id", session.academy_id)
+          .maybeSingle();
+        if (!cls) return NextResponse.json({ ok: false, error: "Class not found." }, { status: 404 });
+        patch.class_id = classId;
+      }
+    }
+    if (body.parent_phone !== undefined) {
+      const phone = String(body.parent_phone).replace(/[\s\-()]/g, "");
+      patch.parent_phone = phone || null;
+    }
+    if (Object.keys(patch).length === 0) {
+      return NextResponse.json({ ok: false, error: "Nothing to update." }, { status: 400 });
+    }
+
+    const { error } = await sb.from("students").update(patch).eq("id", id);
+    if (error) throw error;
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("[admin students PATCH] failed:", err);
+    return NextResponse.json({ ok: false, error: "Could not update student." }, { status: 500 });
+  }
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Upload, Users, UserPlus, Wallet, CircleCheck, KeyRound, Trash2 } from "lucide-react";
+import { Loader2, Upload, Users, UserPlus, Wallet, CircleCheck, KeyRound, Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -55,6 +55,12 @@ export default function AdminPage() {
   const [totalPending, setTotalPending] = useState(0);
   const [delStudent, setDelStudent] = useState<Student | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [editStudent, setEditStudent] = useState<{ s: Student; classId: string } | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editRoll, setEditRoll] = useState("");
+  const [editClassId, setEditClassId] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
   const [dueClass, setDueClass] = useState("");
   const [dueAmount, setDueAmount] = useState("");
 
@@ -106,6 +112,34 @@ export default function AdminPage() {
       else setNotice(j.error || "Import failed.");
     } catch { setNotice("Import failed."); }
     finally { setImporting(false); }
+  };
+
+  const openEdit = (s: Student, classId: string) => {
+    setEditStudent({ s, classId });
+    setEditName(s.name); setEditRoll(s.roll_no);
+    setEditClassId(classId); setEditPhone(s.parent_phone ?? "");
+    setNotice("");
+  };
+
+  const saveEdit = async () => {
+    if (!editStudent) return;
+    if (!editName.trim() || !editRoll.trim()) { setNotice("Name and roll number are required."); return; }
+    setSavingEdit(true);
+    try {
+      const r = await fetch("/api/portal/admin/students", {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editStudent.s.id, name: editName.trim(), roll_no: editRoll.trim(),
+          class_id: editClassId, parent_phone: editPhone.trim(),
+        }),
+      });
+      const j = await r.json();
+      if (j.ok) {
+        setNotice(`${editName.trim()} updated.`);
+        setEditStudent(null); loadStudents();
+      } else setNotice(j.error || "Could not update student.");
+    } catch { setNotice("Could not update student."); }
+    finally { setSavingEdit(false); }
   };
 
   const deleteStudent = async () => {
@@ -192,6 +226,11 @@ export default function AdminPage() {
                   <div key={s.id} className="flex items-center justify-between gap-2 rounded-lg bg-muted/50 px-3 py-2 text-sm">
                     <span className="min-w-0 flex-1 truncate font-medium">Roll {s.roll_no} · {s.name}</span>
                     <Badge className={`border ${chipStyles[s.fee_chip]}`}>{chipLabel[s.fee_chip]}</Badge>
+                    <Button size="icon" variant="ghost" title="Edit student"
+                      className="h-8 w-8 shrink-0 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+                      onClick={() => openEdit(s, c.id)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
                     <Button size="icon" variant="ghost" title="Delete student"
                       className="h-8 w-8 shrink-0 rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
                       onClick={() => setDelStudent(s)}>
@@ -232,7 +271,7 @@ export default function AdminPage() {
 
               {importResult && (
                 <div className="rounded-xl border p-4 text-sm">
-                  <div className="font-bold text-emerald-700">{importResult.imported} import ho gaye, {importResult.skipped} skip hue.</div>
+                  <div className="font-bold text-emerald-700">{importResult.imported} imported, {importResult.skipped} skipped.</div>
                   <div className="mt-2 max-h-48 space-y-1 overflow-auto">
                     {importResult.results.filter((r) => !r.ok).map((r) => (
                       <div key={r.row} className="text-red-700">Row {r.row}: {r.error}</div>
@@ -337,6 +376,47 @@ export default function AdminPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!editStudent} onOpenChange={(o) => !o && setEditStudent(null)}>
+        <DialogContent className="rounded-2xl sm:max-w-md">
+          <DialogHeader><DialogTitle>Edit Student</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Name</label>
+              <Input value={editName} onChange={(e) => setEditName(e.target.value)}
+                placeholder="Student name" className="h-12 rounded-xl" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Roll No</label>
+                <Input value={editRoll} onChange={(e) => setEditRoll(e.target.value)}
+                  placeholder="e.g. 12" className="h-12 rounded-xl" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Class</label>
+                <Select value={editClassId} onValueChange={setEditClassId}>
+                  <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder="Class" /></SelectTrigger>
+                  <SelectContent>
+                    {classes.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Parent Phone <span className="font-normal normal-case">(for WhatsApp fee reminders)</span>
+              </label>
+              <Input value={editPhone} onChange={(e) => setEditPhone(e.target.value)}
+                placeholder="03XXXXXXXXX" inputMode="tel" className="h-12 rounded-xl" />
+            </div>
+            <DialogFooter>
+              <Button onClick={saveEdit} disabled={savingEdit || !editName.trim() || !editRoll.trim()} className="h-12 w-full rounded-xl font-bold">
+                {savingEdit ? <Loader2 className="h-5 w-5 animate-spin" /> : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!resetFor} onOpenChange={(o) => !o && setResetFor(null)}>
         <DialogContent className="rounded-2xl sm:max-w-sm">
