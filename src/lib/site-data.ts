@@ -71,7 +71,7 @@ export const NAV_LINKS = [
   { label: "Faculty", href: "/#faculty" },
   { label: "Gallery", href: "/#gallery" },
   { label: "Admissions", href: "/#admissions" },
-  { label: "Parent Portal", href: "/#parent-portal" },
+  { label: "Parent Portal", href: "/parent-portal" },
   { label: "Contact", href: "/#contact" },
 ];
 
