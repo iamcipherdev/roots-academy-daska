@@ -716,7 +716,7 @@ export const FOUNDER = {
   name: "Dr. Mohsin Ali",
   role: "Founder / Director",
   qualification: "PhD Physics",
-  photo: "/images/founder_dr_mohsin_ali.jpg",
+  photo: "/images/founder_dr_mohsin_ali_new.jpg",
   supportingLine:
     "Dedicated to building strong academic foundations and helping students grow through focused learning and continuous guidance.",
   intro: [
@@ -803,7 +803,7 @@ export const FACULTY = [
     qualification: "PhD Physics",
     subject: "Physics & Sciences",
     role: "Founder / Director",
-    photo: "/images/founder_dr_mohsin_ali.jpg", // real photo from official Roots Academy poster
+    photo: "/images/founder_dr_mohsin_ali_new.jpg", // real photo from official Roots Academy poster
     profileHref: "/founder",
   },
   {
