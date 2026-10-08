@@ -112,8 +112,28 @@ export function Admissions() {
               </p>
           </Reveal>
 
+          <Reveal delay={0.08}>
+            <ol className="mt-8 grid gap-3 sm:grid-cols-3">
+              {[
+                { n: "1", title: "Send an inquiry", desc: "Fill the form or WhatsApp us." },
+                { n: "2", title: "We call you back", desc: "Fees, timings & campus details." },
+                { n: "3", title: "Visit the campus", desc: "Meet teachers, see the lab." },
+              ].map((s) => (
+                <li key={s.n} className="flex items-start gap-3 rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white font-mono text-[13px] font-bold text-primary">
+                    {s.n}
+                  </span>
+                  <span>
+                    <span className="block text-[14px] font-extrabold text-white">{s.title}</span>
+                    <span className="block text-[12.5px] text-white/65">{s.desc}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </Reveal>
+
           <Reveal delay={0.1}>
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <a
                 href={`https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
                   "Assalam-o-Alaikum! I want to ask about admission at Roots Academy of Sciences, Daska."

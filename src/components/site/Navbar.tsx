@@ -123,7 +123,7 @@ export function Navbar() {
             asChild
             className="hidden h-10 rounded-xl bg-primary px-5 text-[14.5px] font-bold shadow-sm hover:bg-brand-deep sm:inline-flex"
           >
-            <Link href="/#admissions">Admission Inquiry</Link>
+            <Link href="/#admissions">Apply Now</Link>
           </Button>
 
           {/* Mobile / tablet menu */}
@@ -175,7 +175,7 @@ export function Navbar() {
                       asChild
                       className="h-12 w-full rounded-xl bg-primary text-[15px] font-bold hover:bg-brand-deep"
                     >
-                      <Link href="/#admissions">Admission Inquiry</Link>
+                      <Link href="/#admissions">Apply Now</Link>
                     </Button>
                   </SheetClose>
                   <Button

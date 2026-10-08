@@ -65,14 +65,12 @@ export const CAMPUSES: Campus[] = [
 
 export const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Courses", href: "/courses" },
-  { label: "Founder", href: "/founder" },
+  { label: "Programs", href: "/courses" },
+  { label: "Why Roots", href: "/#why-roots" },
   { label: "Faculty", href: "/#faculty" },
   { label: "Gallery", href: "/#gallery" },
   { label: "Admissions", href: "/#admissions" },
   { label: "Parent Portal", href: "/parent-portal" },
-  { label: "Contact", href: "/#contact" },
 ];
 
 export const HERO = {
@@ -141,6 +139,50 @@ export const STRENGTHS: Strength[] = [
     description:
       "Personal academic guidance for every enrolled student — choosing subjects, improving weak areas, planning careers.",
     icon: "Compass",
+  },
+];
+
+/**
+ * WHY_ROOTS — the single merged "why choose us" set for the homepage.
+ * Distilled from STRENGTHS + assessment + why-choose cards: no repetition,
+ * only the distinct reasons a parent picks Roots Academy.
+ */
+export const WHY_ROOTS: Strength[] = [
+  {
+    title: "Weekly Tests",
+    description:
+      "Every week, every subject. Regular class tests keep students in continuous practice instead of last-minute cramming.",
+    icon: "CalendarCheck",
+  },
+  {
+    title: "PhD-Led Faculty",
+    description:
+      "Academics supervised by Dr. Mohsin Ali (PhD Physics), with qualified subject specialists teaching every course.",
+    icon: "GraduationCap",
+  },
+  {
+    title: "Academic Monitoring",
+    description:
+      "Test records tracked for every student — teachers and parents always know exactly where each child stands.",
+    icon: "ClipboardList",
+  },
+  {
+    title: "Separate Girls' Classes",
+    description:
+      "Dedicated, comfortable class arrangements for girls, so every student can learn with confidence.",
+    icon: "ShieldCheck",
+  },
+  {
+    title: "Science With Practicals",
+    description:
+      "Physics, Chemistry, Biology and Mathematics taught with practical demonstrations — not just theory.",
+    icon: "FlaskConical",
+  },
+  {
+    title: "Computer Lab & Modern Skills",
+    description:
+      "A working computer lab on campus — from Office Management and Web Development to AI and Freelancing.",
+    icon: "MonitorSmartphone",
   },
 ];
 

@@ -79,15 +79,9 @@ export function Hero() {
               variant="outline"
               className="h-13 rounded-2xl border-[1.5px] border-primary/25 bg-white px-6 text-[15px] font-bold text-foreground hover:border-primary/50 hover:bg-secondary"
             >
-              <a
-                href={`https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
-                  "Assalam-o-Alaikum! I want to ask about admission at Roots Academy of Sciences, Daska."
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <MessageCircle className="mr-2 h-4.5 w-4.5 text-primary" aria-hidden />
-                WhatsApp Us
+              <a href="#programs">
+                Explore Programs
+                <ArrowRight className="ml-2 h-4.5 w-4.5 text-primary" aria-hidden />
               </a>
             </Button>
           </motion.div>
