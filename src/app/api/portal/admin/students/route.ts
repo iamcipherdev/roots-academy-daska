@@ -147,3 +147,39 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Import nahi ho saka." }, { status: 500 });
   }
 }
+
+/** DELETE /api/portal/admin/students?id=... — delete a student and their rows (admin only). */
+export async function DELETE(req: NextRequest) {
+  const guard = await requireStaff("admin");
+  if ("response" in guard) return guard.response;
+  if (!isPortalConfigured()) {
+    return NextResponse.json({ ok: false, error: "Database connect nahi hui." }, { status: 503 });
+  }
+  try {
+    const id = new URL(req.url).searchParams.get("id")?.trim();
+    if (!id) {
+      return NextResponse.json({ ok: false, error: "Student id missing." }, { status: 400 });
+    }
+    const { session } = guard;
+    const sb = supabaseAdmin();
+    const { data: st } = await sb
+      .from("students")
+      .select("id, name")
+      .eq("id", id)
+      .eq("academy_id", session.academy_id)
+      .maybeSingle();
+    if (!st) {
+      return NextResponse.json({ ok: false, error: "Student nahi mila." }, { status: 404 });
+    }
+    for (const table of ["attendance", "fees", "marks"]) {
+      const { error } = await sb.from(table).delete().eq("student_id", id);
+      if (error) throw error;
+    }
+    const { error: delErr } = await sb.from("students").delete().eq("id", id);
+    if (delErr) throw delErr;
+    return NextResponse.json({ ok: true, name: st.name });
+  } catch (err) {
+    console.error("[admin students DELETE] failed:", err);
+    return NextResponse.json({ ok: false, error: "Delete nahi ho saka." }, { status: 500 });
+  }
+}

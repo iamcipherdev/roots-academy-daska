@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Upload, Users, UserPlus, Wallet, CircleCheck, KeyRound } from "lucide-react";
+import { Loader2, Upload, Users, UserPlus, Wallet, CircleCheck, KeyRound, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { currentMonthKey, monthLabel } from "@/lib/portal/dates";
 
 interface Student { id: string; name: string; roll_no: string; parent_phone: string | null; fee_chip: string }
@@ -49,6 +53,8 @@ export default function AdminPage() {
   // overview
   const [pending, setPending] = useState<PendingRow[]>([]);
   const [totalPending, setTotalPending] = useState(0);
+  const [delStudent, setDelStudent] = useState<Student | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [dueClass, setDueClass] = useState("");
   const [dueAmount, setDueAmount] = useState("");
 
@@ -100,6 +106,20 @@ export default function AdminPage() {
       else setNotice(j.error || "Import nahi ho saka.");
     } catch { setNotice("Import nahi ho saka."); }
     finally { setImporting(false); }
+  };
+
+  const deleteStudent = async () => {
+    if (!delStudent) return;
+    setDeleting(true);
+    try {
+      const r = await fetch(`/api/portal/admin/students?id=${encodeURIComponent(delStudent.id)}`, { method: "DELETE" });
+      const j = await r.json();
+      if (j.ok) {
+        setNotice(`${delStudent.name} delete ho gaya.`);
+        setDelStudent(null); loadStudents();
+      } else setNotice(j.error || "Delete nahi ho saka.");
+    } catch { setNotice("Delete nahi ho saka."); }
+    finally { setDeleting(false); }
   };
 
   const addStaff = async () => {
@@ -169,9 +189,14 @@ export default function AdminPage() {
               <CardHeader className="pb-2"><CardTitle className="text-base">{c.name} <span className="text-sm font-normal text-muted-foreground">({c.students.length})</span></CardTitle></CardHeader>
               <CardContent className="space-y-1.5">
                 {c.students.map((s) => (
-                  <div key={s.id} className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2 text-sm">
-                    <span className="font-medium">Roll {s.roll_no} · {s.name}</span>
+                  <div key={s.id} className="flex items-center justify-between gap-2 rounded-lg bg-muted/50 px-3 py-2 text-sm">
+                    <span className="min-w-0 flex-1 truncate font-medium">Roll {s.roll_no} · {s.name}</span>
                     <Badge className={`border ${chipStyles[s.fee_chip]}`}>{chipLabel[s.fee_chip]}</Badge>
+                    <Button size="icon" variant="ghost" title="Student delete karein"
+                      className="h-8 w-8 shrink-0 rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => setDelStudent(s)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 ))}
                 {c.students.length === 0 && <p className="text-sm text-muted-foreground">Koi student nahi.</p>}
@@ -292,6 +317,26 @@ export default function AdminPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!delStudent} onOpenChange={(o) => !o && setDelStudent(null)}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Student delete karein?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span className="font-bold text-foreground">{delStudent?.name}</span> (Roll {delStudent?.roll_no}) ka
+              record, hazri, fee aur results <span className="font-bold text-destructive">hamesha ke liye delete</span> ho
+              jayenge. Ye wapas nahi ho sakta.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Rehne Dein</AlertDialogCancel>
+            <AlertDialogAction onClick={deleteStudent} disabled={deleting}
+              className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete Karein"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={!!resetFor} onOpenChange={(o) => !o && setResetFor(null)}>
         <DialogContent className="rounded-2xl sm:max-w-sm">
