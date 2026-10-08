@@ -110,7 +110,7 @@ export function Hero() {
             <div className="col-span-8 row-span-6 relative overflow-hidden rounded-[1.6rem] shadow-card ring-1 ring-border">
               <Image
                 src={HERO.images.main}
-                alt="Roots Academy computer lab — students working at computers, Model Town Daska campus"
+                alt="Certificate ceremony at Roots Academy of Sciences — Daska campus"
                 fill
                 priority
                 sizes="(max-width: 1024px) 70vw, 480px"
@@ -119,7 +119,7 @@ export function Hero() {
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-10">
                 <p className="flex items-center gap-1.5 text-[12.5px] font-semibold text-white">
                   <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                  Computer Lab — Model Town Campus, Daska
+                  Roots Academy of Sciences — Daska
                 </p>
               </div>
             </div>
@@ -128,7 +128,7 @@ export function Hero() {
             <div className="col-span-4 row-span-3 relative overflow-hidden rounded-[1.4rem] shadow-card ring-1 ring-border">
               <Image
                 src={HERO.images.secondary}
-                alt="Inside the Roots Academy Daska campus"
+                alt="Official admissions poster — Roots Academy Daska"
                 fill
                 priority
                 sizes="(max-width: 1024px) 30vw, 220px"
@@ -140,7 +140,7 @@ export function Hero() {
             <div className="col-span-4 row-span-3 relative overflow-hidden rounded-[1.4rem] shadow-card ring-1 ring-border">
               <Image
                 src={HERO.images.tertiary}
-                alt="Practical class demonstration at Roots Academy"
+                alt="Student achievement ceremony at Roots Academy"
                 fill
                 priority
                 sizes="(max-width: 1024px) 30vw, 220px"

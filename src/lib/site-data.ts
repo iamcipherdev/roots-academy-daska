@@ -79,9 +79,9 @@ export const HERO = {
   sub: "Quality education, regular assessment and dedicated academic guidance for students in Daska.",
   chips: ["Weekly Tests", "Monthly Short Tests", "Girls Separate Classes", "PhD-Led Faculty"],
   images: {
-    main: "/images/lab-hero.jpg", // real computer lab — Google Maps listing
-    secondary: "/images/interior.jpg", // real academy interior
-    tertiary: "/images/practical-class.jpg", // real practical class
+    main: "/images/gallery/ceremony-1.jpg", // certificate ceremony — Roots Academy banner
+    secondary: "/images/gallery/poster-admission-2026.jpg", // official admissions poster
+    tertiary: "/images/gallery/ceremony-2.jpg", // student achievement ceremony
   },
 };
 
