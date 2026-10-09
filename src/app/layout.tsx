@@ -53,11 +53,31 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    name: "Roots Academy of Sciences & Computer College",
+    url: "https://rootsacademy.space-z.ai",
+    description:
+      "Quality education, regular assessment and dedicated academic guidance for students in Daska — academic, computer, language and professional courses.",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Daska",
+      addressRegion: "Punjab",
+      addressCountry: "PK",
+    },
+    areaServed: ["Daska", "Jamke Cheema", "Sialkot"],
+  };
+
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <body
         className={`${jakarta.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
         {children}
         <Toaster />
         <SonnerToaster position="top-center" richColors closeButton />
