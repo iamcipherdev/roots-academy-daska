@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Upload, Users, UserPlus, Wallet, CircleCheck, KeyRound, Trash2, Pencil } from "lucide-react";
+import { Loader2, Upload, Users, UserPlus, Wallet, CircleCheck, KeyRound, Trash2, Pencil, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,6 +20,7 @@ interface Student { id: string; name: string; roll_no: string; parent_phone: str
 interface ClassInfo { id: string; name: string; students: Student[] }
 interface StaffRow { id: string; name: string; phone: string; role: string }
 interface PendingRow { student_id: string; name: string; roll_no: string; class_name: string; amount_due: number; amount_paid: number; pending: number }
+interface Inquiry { id: string; student_name: string; phone: string; current_class: string | null; program: string | null; message: string | null; status: string; created_at: string }
 
 const chipStyles: Record<string, string> = {
   paid: "bg-emerald-100 text-emerald-800 border-emerald-200",
@@ -49,6 +50,10 @@ export default function AdminPage() {
   const [adding, setAdding] = useState(false);
   const [resetFor, setResetFor] = useState<StaffRow | null>(null);
   const [newPin, setNewPin] = useState("");
+
+  // inquiries
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [inqLoading, setInqLoading] = useState(false);
 
   // overview
   const [pending, setPending] = useState<PendingRow[]>([]);
@@ -82,8 +87,26 @@ export default function AdminPage() {
       if (j.ok) { setPending(j.pending); setTotalPending(j.total_pending); }
     });
   };
+  const loadInquiries = () => {
+    setInqLoading(true);
+    fetch("/api/portal/admin/inquiries").then(async (r) => {
+      const j = await r.json(); if (j.ok) setInquiries(j.inquiries);
+      setInqLoading(false);
+    });
+  };
+  const setInquiryStatus = (id: string, status: string) => {
+    fetch("/api/portal/admin/inquiries", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status }),
+    }).then(async (r) => {
+      const j = await r.json();
+      if (j.ok) { setInquiries((prev) => prev.map((q) => q.id === id ? { ...q, status } : q)); setNotice("Inquiry status updated."); }
+      else setNotice(j.error || "Could not update inquiry.");
+    });
+  };
 
-  useEffect(() => { loadStudents(); loadStaff(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { loadStudents(); loadStaff(); loadInquiries(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { loadOverview(month); }, [month]);
 
   const parseCSV = () => {
@@ -206,11 +229,14 @@ export default function AdminPage() {
       )}
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid w-full grid-cols-4 rounded-xl">
+        <TabsList className="grid w-full grid-cols-5 rounded-xl">
           <TabsTrigger value="students" className="rounded-lg"><Users className="mr-1 h-4 w-4" />Students</TabsTrigger>
           <TabsTrigger value="import" className="rounded-lg"><Upload className="mr-1 h-4 w-4" />Import</TabsTrigger>
           <TabsTrigger value="staff" className="rounded-lg"><UserPlus className="mr-1 h-4 w-4" />Staff</TabsTrigger>
           <TabsTrigger value="fees" className="rounded-lg"><Wallet className="mr-1 h-4 w-4" />Fees</TabsTrigger>
+          <TabsTrigger value="inquiries" className="rounded-lg"><MessageCircle className="mr-1 h-4 w-4" />Inquiries{inquiries.filter((q) => q.status === "new").length > 0 && (
+            <span className="ml-1 rounded-full bg-primary px-1.5 text-[10px] font-bold text-white">{inquiries.filter((q) => q.status === "new").length}</span>
+          )}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="students" className="mt-5 space-y-4">
@@ -332,6 +358,64 @@ export default function AdminPage() {
                 ))}
                 {pending.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">Sab ne fee de di hai. 🎉</p>}
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="inquiries" className="mt-5 space-y-4">
+          <Card className="rounded-2xl">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Admission Inquiries
+                <span className="ml-2 text-sm font-normal text-muted-foreground">({inquiries.length})</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {inqLoading ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+              ) : inquiries.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">No inquiries yet. Website form se aane wali inquiries yahan dikhengi.</p>
+              ) : (
+                <div className="space-y-3">
+                  {inquiries.map((q) => (
+                    <div key={q.id} className="rounded-xl border p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="font-bold">{q.student_name}</div>
+                        <Badge className={`border ${q.status === "new" ? "bg-blue-100 text-blue-800 border-blue-200" : q.status === "contacted" ? "bg-amber-100 text-amber-800 border-amber-200" : q.status === "enrolled" ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-muted text-muted-foreground"}`}>
+                          {q.status}
+                        </Badge>
+                      </div>
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        {q.phone}
+                        {q.current_class ? ` · ${q.current_class}` : ""}
+                        {q.program ? ` · ${q.program}` : ""}
+                      </div>
+                      {q.message && <p className="mt-2 text-sm">{q.message}</p>}
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        {new Date(q.created_at).toLocaleString("en-PK", { dateStyle: "medium", timeStyle: "short" })}
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <a
+                          href={`https://wa.me/92${q.phone.replace(/[\s\-()]/g, "").replace(/^0/, "")}?text=${encodeURIComponent(`Assalam-o-Alaikum ${q.student_name}! Roots Academy se baat kar raha hun — aap ne admission inquiry bheji thi.`)}`}
+                          target="_blank" rel="noopener noreferrer"
+                        >
+                          <Button size="sm" variant="outline" className="rounded-lg font-bold">
+                            <MessageCircle className="mr-1 h-4 w-4" />WhatsApp
+                          </Button>
+                        </a>
+                        <Select value={q.status} onValueChange={(v) => setInquiryStatus(q.id, v)}>
+                          <SelectTrigger className="h-9 w-36 rounded-lg text-xs"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="new">New</SelectItem>
+                            <SelectItem value="contacted">Contacted</SelectItem>
+                            <SelectItem value="enrolled">Enrolled</SelectItem>
+                            <SelectItem value="closed">Closed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

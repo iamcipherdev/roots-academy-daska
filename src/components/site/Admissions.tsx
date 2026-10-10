@@ -71,11 +71,21 @@ export function Admissions() {
       if (!res.ok || !data.ok) {
         throw new Error(data.error || "Submission failed");
       }
+      // Open WhatsApp with the inquiry prefilled so it reaches us instantly
+      const waText = [
+        "New Admission Inquiry — Roots Academy Website",
+        `Name: ${values.studentName}`,
+        `Phone: ${values.phone}`,
+        `Class: ${values.currentClass || "-"}`,
+        `Program: ${values.program || "-"}`,
+        values.message ? `Message: ${values.message}` : "",
+      ].filter(Boolean).join("\n");
+      window.open(waHref(waText), "_blank");
       setDone(true);
       reset();
       toast.success("Inquiry received!", {
         description:
-          "JazakAllah! Our team will contact you shortly. For an instant response, message us on WhatsApp.",
+          "JazakAllah! WhatsApp par aap ki inquiry khul gayi hai — send dabayein taake hum foran rabta karein.",
       });
     } catch (err) {
       toast.error("Could not send inquiry", {
@@ -192,8 +202,9 @@ export function Admissions() {
                   Inquiry sent successfully
                 </h3>
                 <p className="mt-2 max-w-sm text-[14.5px] leading-relaxed text-muted-foreground">
-                  Thank you for choosing Roots Academy. Our admissions team will contact you
-                  soon, In sha Allah.
+                  Thank you for choosing Roots Academy. WhatsApp par aap ki inquiry khul gayi
+                  hai — <strong>send dabana na bhoolen</strong>, taake hum foran rabta kar saken,
+                  In sha Allah.
                 </p>
                 <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
                   <Button
