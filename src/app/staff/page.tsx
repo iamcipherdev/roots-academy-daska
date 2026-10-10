@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { GraduationCap, Loader2, Phone, Lock } from "lucide-react";
+import { GraduationCap, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 export default function StaffLoginPage() {
-  const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -21,7 +20,7 @@ export default function StaffLoginPage() {
       const r = await fetch("/api/portal/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, pin }),
+        body: JSON.stringify({ pin }),
       });
       const j = await r.json();
       if (j.ok) {
@@ -49,25 +48,16 @@ export default function StaffLoginPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={phone} onChange={(e) => setPhone(e.target.value)}
-              placeholder="Phone number (03XXXXXXXXX)"
-              inputMode="tel" className="h-12 rounded-xl pl-10"
-              onKeyDown={(e) => e.key === "Enter" && submit()}
-            />
-          </div>
-          <div className="relative">
             <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={pin} onChange={(e) => setPin(e.target.value)}
-              placeholder="Password" type="password"
+              placeholder="Enter your PIN" type="password"
               className="h-12 rounded-xl pl-10"
               onKeyDown={(e) => e.key === "Enter" && submit()}
             />
           </div>
           {error && <p className="rounded-xl bg-red-50 p-3 text-center text-sm font-medium text-red-700">{error}</p>}
-          <Button onClick={submit} disabled={busy || !phone.trim() || !pin.trim()} className="h-12 w-full rounded-xl text-base font-bold">
+          <Button onClick={submit} disabled={busy || !pin.trim()} className="h-12 w-full rounded-xl text-base font-bold">
             {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : "Login"}
           </Button>
         </CardContent>

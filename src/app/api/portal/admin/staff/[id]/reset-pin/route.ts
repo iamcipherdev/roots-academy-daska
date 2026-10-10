@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireStaff } from "@/lib/portal/guards";
 import { supabaseAdmin, isPortalConfigured } from "@/lib/portal/supabase";
-import { hashPin, newSalt } from "@/lib/portal/auth";
+import { hashPin, newSalt, isPinTaken } from "@/lib/portal/auth";
 
 /** POST /api/portal/admin/staff/[id]/reset-pin — admin sets a new PIN (shown once, never stored). */
 export async function POST(
@@ -25,7 +25,11 @@ export async function POST(
     }
 
     const salt = newSalt();
-    const { data, error } = await supabaseAdmin()
+    const sb = supabaseAdmin();
+    if (await isPinTaken(sb, guard.session.academy_id, parsed.data.pin, id)) {
+      return NextResponse.json({ ok: false, error: "This PIN is already in use. Choose a different PIN." }, { status: 409 });
+    }
+    const { data, error } = await sb
       .from("staff")
       .update({ pin_hash: hashPin(salt, parsed.data.pin), salt })
       .eq("id", id)

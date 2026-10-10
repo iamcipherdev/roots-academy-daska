@@ -25,6 +25,28 @@ export function newSalt(): string {
     .slice(0, 32);
 }
 
+/** Check whether a PIN is already used by another staff member.
+ *  PINs must be unique because staff login is PIN-only. */
+export async function isPinTaken(
+  sb: any,
+  academyId: string,
+  pin: string,
+  excludeId?: string
+): Promise<boolean> {
+  const { data, error } = await sb
+    .from("staff")
+    .select("id, pin_hash, salt")
+    .eq("academy_id", academyId);
+  if (error) throw error;
+  return ((data ?? []) as { id: string; pin_hash: string; salt: string }[]).some((s) => {
+    if (excludeId && s.id === excludeId) return false;
+    const candidate = hashPin(s.salt, pin);
+    const a = Buffer.from(candidate, "utf8");
+    const b = Buffer.from(s.pin_hash, "utf8");
+    return a.length === b.length && timingSafeEqual(a, b);
+  });
+}
+
 function sessionSecret(): string {
   const s = process.env.SESSION_SECRET;
   if (!s) throw new Error("[portal] missing env var SESSION_SECRET");

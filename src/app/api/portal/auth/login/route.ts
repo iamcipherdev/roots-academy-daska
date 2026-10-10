@@ -5,11 +5,10 @@ import { supabaseAdmin, isPortalConfigured } from "@/lib/portal/supabase";
 import { hashPin, createSessionToken, setStaffSessionCookie } from "@/lib/portal/auth";
 
 const loginSchema = z.object({
-  phone: z.string().trim().min(10).max(15).regex(/^[0-9+\-\s()]+$/),
   pin: z.string().trim().min(4).max(32),
 });
 
-const GENERIC_ERROR = "Incorrect phone number or PIN.";
+const GENERIC_ERROR = "Incorrect PIN.";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,27 +20,30 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ ok: false, error: GENERIC_ERROR }, { status: 400 });
     }
-    const phone = parsed.data.phone.replace(/[\s\-()]/g, "");
 
     const sb = supabaseAdmin();
-    const { data: staff, error } = await sb
+    const { data: staffList, error } = await sb
       .from("staff")
-      .select("id, name, phone, pin_hash, salt, role, academy_id")
-      .eq("phone", phone)
-      .maybeSingle();
-
+      .select("id, name, pin_hash, salt, role, academy_id");
     if (error) throw error;
-    if (!staff) {
-      return NextResponse.json({ ok: false, error: GENERIC_ERROR }, { status: 401 });
-    }
 
-    const candidate = hashPin(staff.salt as string, parsed.data.pin);
-    const a = Buffer.from(candidate, "utf8");
-    const b = Buffer.from(staff.pin_hash as string, "utf8");
-    const match = a.length === b.length && timingSafeEqual(a, b);
-    if (!match) {
+    const matches = (staffList ?? []).filter((s) => {
+      const candidate = hashPin(s.salt as string, parsed.data.pin);
+      const a = Buffer.from(candidate, "utf8");
+      const b = Buffer.from(s.pin_hash as string, "utf8");
+      return a.length === b.length && timingSafeEqual(a, b);
+    });
+
+    if (matches.length === 0) {
       return NextResponse.json({ ok: false, error: GENERIC_ERROR }, { status: 401 });
     }
+    if (matches.length > 1) {
+      return NextResponse.json(
+        { ok: false, error: "This PIN is shared by multiple staff. Ask the admin to reset PINs." },
+        { status: 401 }
+      );
+    }
+    const staff = matches[0];
 
     const token = createSessionToken({
       staff_id: staff.id as string,

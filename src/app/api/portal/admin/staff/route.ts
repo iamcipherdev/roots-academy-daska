@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireStaff } from "@/lib/portal/guards";
 import { supabaseAdmin, isPortalConfigured } from "@/lib/portal/supabase";
-import { hashPin, newSalt } from "@/lib/portal/auth";
+import { hashPin, newSalt, isPinTaken } from "@/lib/portal/auth";
 
 const addSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -48,7 +48,12 @@ export async function POST(req: NextRequest) {
     const phone = parsed.data.phone.replace(/[\s\-()]/g, "");
     const salt = newSalt();
 
-    const { data, error } = await supabaseAdmin()
+    const sb = supabaseAdmin();
+    if (await isPinTaken(sb, guard.session.academy_id, parsed.data.pin)) {
+      return NextResponse.json({ ok: false, error: "This PIN is already in use. Choose a different PIN." }, { status: 409 });
+    }
+
+    const { data, error } = await sb
       .from("staff")
       .insert({
         academy_id: guard.session.academy_id,
