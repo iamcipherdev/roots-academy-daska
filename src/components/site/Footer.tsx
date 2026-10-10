@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { GraduationCap, Phone, MapPin, MessageCircle, Youtube, Music2, ArrowUpRight } from "lucide-react";
+import { Phone, MapPin, MessageCircle, Youtube, Music2, ArrowUpRight } from "lucide-react";
 import { CONTACT, NAV_LINKS, CAMPUSES, telHref } from "@/lib/site-data";
+import LogoMark from "@/components/site/LogoMark";
 
 export function Footer() {
   return (
@@ -12,9 +13,7 @@ export function Footer() {
           {/* brand */}
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
-                <GraduationCap className="h-5.5 w-5.5" aria-hidden />
-              </span>
+              <LogoMark className="h-10 w-10 shrink-0" />
               <span className="leading-tight">
                 <span className="block text-[17px] font-extrabold tracking-tight text-white">
                   Roots <span className="text-primary">Academy</span>
