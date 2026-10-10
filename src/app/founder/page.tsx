@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { GraduationCap, BadgeCheck, Quote, ArrowRight } from "lucide-react";
-import { FOUNDER, waHref } from "@/lib/site-data";
+import { GraduationCap, BadgeCheck, Quote, ArrowRight, Music2 } from "lucide-react";
+import { FOUNDER, CONTACT, waHref } from "@/lib/site-data";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { FloatingActions } from "@/components/site/FloatingActions";
@@ -94,6 +94,21 @@ export default function FounderPage() {
                       className="h-12 rounded-xl border-[1.5px] border-primary/25 bg-white px-6 text-[14.5px] font-bold text-foreground hover:border-primary/50 hover:bg-secondary"
                     >
                       <Link href="/#admissions">Admission Inquiry</Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="h-12 rounded-xl border-[1.5px] border-primary/25 bg-white px-6 text-[14.5px] font-bold text-foreground hover:border-primary/50 hover:bg-secondary"
+                    >
+                      <a
+                        href={CONTACT.socials.tiktok}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Dr. Mohsin Ali on TikTok"
+                      >
+                        <Music2 className="mr-2 h-4 w-4" aria-hidden />
+                        TikTok
+                      </a>
                     </Button>
                   </div>
                 </div>
