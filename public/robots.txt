@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://rootsacademy.space-z.ai/sitemap.xml
+Sitemap: https://therootsacademy.net/sitemap.xml

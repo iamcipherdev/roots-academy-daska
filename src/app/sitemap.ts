@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { COURSES } from "@/lib/site-data";
 
-const BASE = "https://rootsacademy.space-z.ai";
+const BASE = "https://therootsacademy.net";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [

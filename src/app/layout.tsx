@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rootsacademy.space-z.ai"),
+  metadataBase: new URL("https://therootsacademy.net"),
   title: {
     default: "Roots Academy of Sciences | Daska",
     template: "%s | Roots Academy",
@@ -57,7 +57,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
     name: "Roots Academy of Sciences & Computer College",
-    url: "https://rootsacademy.space-z.ai",
+    url: "https://therootsacademy.net",
     description:
       "Quality education, regular assessment and dedicated academic guidance for students in Daska — academic, computer, language and professional courses.",
     address: {
