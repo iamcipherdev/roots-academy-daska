@@ -24,7 +24,7 @@ export const CONTACT = {
     "https://www.google.com/maps/place/Roots+Academy+of+Sciences/@32.329838,74.3492103,17z",
   socials: {
     youtube: "https://www.youtube.com/@RootsacademyOfsicence",
-    tiktok: "https://www.tiktok.com/@roots.academy.of",
+    tiktok: "https://www.tiktok.com/@dr..mohsin.ali",
   },
 };
 
