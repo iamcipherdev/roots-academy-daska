@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GraduationCap, Menu, Phone } from "lucide-react";
+import { Menu, Phone } from "lucide-react";
 import { NAV_LINKS, CONTACT, telHref } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
+import LogoMark from "@/components/site/LogoMark";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -73,9 +74,7 @@ export function Navbar() {
           className="flex min-w-0 items-center gap-2.5"
           aria-label="Roots Academy home"
         >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
-            <GraduationCap className="h-5.5 w-5.5" aria-hidden />
-          </span>
+          <LogoMark className="h-10 w-10 shrink-0 shadow-sm" />
           <span className="leading-tight">
             <span className="block whitespace-nowrap text-[17px] font-extrabold tracking-tight text-foreground">
               Roots <span className="text-primary">Academy</span>
@@ -145,9 +144,7 @@ export function Navbar() {
             >
               <SheetHeader className="border-b border-border px-5 py-4 text-left">
                 <SheetTitle className="flex items-center gap-2.5">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white">
-                    <GraduationCap className="h-5 w-5" aria-hidden />
-                  </span>
+                  <LogoMark className="h-9 w-9 shrink-0" />
                   <span className="text-base font-extrabold">
                     Roots <span className="text-primary">Academy</span>
                   </span>
